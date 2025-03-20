@@ -1,16 +1,8 @@
-## Space Invaders Game
+## Brain Project
 
-![Space Invaders Gameplay](media/SpaceInvaders.gif)
+![Space Invaders Gameplay](media/cosmic-brain-image.jpg)
 
-This game is a modified version of the classic Atari Space Invaders. In this version, the aliens move toward you rather than staying stationary. The objective is to earn as many points as possible by eliminating aliens without losing all of your health. Your health will gradually regenerate over time.
-
-Instructions for gameplay will also be displayed upon running the program.
-
-You can choose a difficulty level from 1 to 5 (1 being the easiest, 5 being the hardest).
-The score counter is displayed at the bottom center of the screen, and your health is shown at the top left.
-Your highest score is saved, and you can continue playing after reaching a new high score.
-
-Good luck!
+The Brain Project is a model to mimic the human brain patterns through the incorporation of AI transformer models that communicate to each other through the use of channels. The project hopes to create a model capable of replicating human emotions.
 
 ## Gradle Build Instructions
 
@@ -21,28 +13,40 @@ This project uses Gradle to manage dependencies and build tasks.
 Before running the game, ensure you have the following installed:
 - [Java Development Kit (JDK) 8 or higher](https://www.oracle.com/java/technologies/javase-downloads.html)
 - [Gradle](https://gradle.org/install/)
+- [Python 3.8 or higher](https://www.python.org/downloads/)
 
-### Run the Game
+### Build and run the project
 
-To build and run the game, open a terminal or command prompt and navigate to the root directory of the project. Then, use the following Gradle commands:
+Go to build.gradle and set the variable `pythonExecutable` to the name of the Python command on your system if it is not "python3".
 
-1. Build the project:
-```bash
-gradle build
+On Windows, run the following:
+```powershell
+.\gradlew.bat build
 ```
 
-2. Run the game:
-
+On Linux/Mac, run the following:
 ```bash
-gradle run
+./gradlew build
 ```
 
-The game should now launch, and you can start playing.
+After the project is built, run the following on Windows:
+```powershell
+.\gradlew.bat run
+```
+
+On Linux/Mac:
+```bash
+./gradlew run
+```
 
 ### Clean the project
 
-```bash
-gradle clean
+To remove any generated files and start fresh, run the following on Windows:
+```powershell
+.\gradlew.bat clean
 ```
 
-This will remove any generated files, allowing you to start fresh with a new build.
+To clean the project on Linux/Mac, run the following:
+```powershell
+./gradlew clean
+```
