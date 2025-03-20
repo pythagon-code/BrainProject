@@ -16,8 +16,7 @@ public class Main {
             ModelClientProcess model = new ModelClientProcess();
             model.send(new JSONObject("{\"strin\":null}"));
         }
-
-
+        
         System.out.println("hello world");
 
         while (true) {
