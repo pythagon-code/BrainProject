@@ -22,20 +22,12 @@ Go to build.gradle and set the variable `pythonExecutable` to the name of the Py
 On Windows, run the following:
 ```powershell
 .\gradlew.bat build
-```
-
-On Linux/Mac, run the following:
-```bash
-./gradlew build
-```
-
-After the project is built, run the following on Windows:
-```powershell
 .\gradlew.bat run
 ```
 
-On Linux/Mac:
+On Linux/Mac, instead run the following:
 ```bash
+./gradlew build
 ./gradlew run
 ```
 
