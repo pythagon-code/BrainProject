@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+def pythonExecutable = "python3" // Modify this to the correct Python executable for your system
+
+group 'edu.illinois.abhayp4'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'org.json:json:20230618'
+}
+
+application {
+    mainClass = 'edu.illinois.abhayp4.main.Main'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task installPythonDependencies {
+    doLast {
+        exec {
+            commandLine pythonExecutable, '-m', 'pip', 'install', '--upgrade', 'pip'
+        }
+
+        exec {
+            commandLine pythonExecutable, '-m', 'pip', 'install', '-r', 'requirements.txt'
+        }
+    }
+}
+
+build.dependsOn installPythonDependencies
+
+tasks.named('run') {
+    args = [pythonExecutable, "\\src\\main\\python\\client.py"]
+}
