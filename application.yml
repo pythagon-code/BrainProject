@@ -1,0 +1,11 @@
+application:
+  main_config:
+    python_executable: "python3"        # Modify this to the Python executable on your system
+    training_mode: true
+    preload:
+      enabled: true
+      from: "./data/models/model1.bin"
+    log: true
+
+  model_parameters:
+    # Empty
