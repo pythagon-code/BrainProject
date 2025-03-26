@@ -1,1 +1,1 @@
-Your models will be saved here.
+Your models will be saved under this folder.
