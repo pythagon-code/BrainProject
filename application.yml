@@ -3,9 +3,9 @@ application:
     python_executable: "python3"        # Modify this to the Python executable on your system
     training_mode: true
     preload:
-      enabled: true
-      from: "./data/models/model1.bin"
+        enabled: true
+        from: "./data/models/model1.bin"
     log: true
 
   model_parameters:
-    # Empty
+    n_levels: 6
