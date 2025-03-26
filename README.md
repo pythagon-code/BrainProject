@@ -19,7 +19,7 @@ Before running the game, ensure you have the following installed:
 
 ### Build and run the project
 
-Go to `build.gradle` and set the variable `pythonExecutable` to the name of the Python command on your system if it is not **`python3`**.
+Go to `application.yml` and set the variable `python_executable` to the name of the Python command on your system if it is not **`python3`**. Also, note building this project will modify your Python dependencies.
 
 On Windows, run the following:
 ```powershell
@@ -32,6 +32,8 @@ On Linux/Mac, instead run the following:
 ./gradlew build
 ./gradlew run
 ```
+
+Once you call build, you do need to call build again.
 
 ### Clean the project
 
