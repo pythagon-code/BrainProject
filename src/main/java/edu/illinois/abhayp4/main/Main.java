@@ -12,8 +12,8 @@ import org.json.JSONObject;
 import edu.illinois.abhayp4.*;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        ModelClient.initialize(args[0], args[1]);
+    public static void main(String[] args) {
+        ModelClient.initialize(args[1], args[0]);
 
         System.out.println("hello world");
         
