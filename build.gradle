@@ -1,9 +1,18 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.yaml:snakeyaml:2.3'
+    }
+}
+
 plugins {
     id 'java'
     id 'application'
+    id 'groovy'
 }
-
-def pythonExecutable = "python3" // Modify this to the correct Python executable for your system
 
 group 'edu.illinois.abhayp4'
 version '1.0-SNAPSHOT'
@@ -25,20 +34,39 @@ test {
     useJUnitPlatform()
 }
 
+def application
+
+task loadApplicationYml {
+    def yaml = new org.yaml.snakeyaml.Yaml()
+    application = yaml.load(new File('application.yml').text).application
+    println application
+}
+
 task installPythonDependencies {
+    def pythonExec = application.main_config.python_executable
+
     doLast {
         exec {
-            commandLine pythonExecutable, '-m', 'pip', 'install', '--upgrade', 'pip'
+            commandLine pythonExec, '-m', 'pip', 'install', '--upgrade', 'pip'
         }
 
         exec {
-            commandLine pythonExecutable, '-m', 'pip', 'install', '-r', 'requirements.txt'
+            commandLine pythonExec, '-m', 'pip', 'install', '-r', 'requirements.txt'
         }
     }
 }
 
+tasks.named('run') {
+    doFirst {
+        args = [
+            '/src/main/python/client.py',
+            application.main_config.python_executable
+        ]
+    }
+}
+
+installPythonDependencies.dependsOn loadApplicationYml
+
 build.dependsOn installPythonDependencies
 
-tasks.named('run') {
-    args = [pythonExecutable, "\\src\\main\\python\\client.py"]
-}
+run.dependsOn loadApplicationYml
