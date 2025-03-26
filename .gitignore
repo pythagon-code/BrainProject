@@ -1,11 +1,19 @@
+# Gradle output and cache
 /.gradle/
 /build/
+
+# Generic output
 /bin/
 /out/
 
+# VS Code specific
 /.vscode/
 
-/workspace/
-
+# Compiled class files
 *.class
+
+# Generated log files
 *.log
+
+# Use this directory for local testing and temporary files
+/local/
