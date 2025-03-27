@@ -3,6 +3,7 @@ application:
     main_config:
         python_executable: "python3"
         n_python_workers: 32
+        use_cuda: yes
         training_mode: yes
         preload:
             enabled: yes
