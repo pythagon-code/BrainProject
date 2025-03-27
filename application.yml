@@ -1,11 +1,21 @@
+# Note the application is not complete, so most of these values are not being used
 application:
-  main_config:
-    python_executable: "python3"        # Modify this to the Python executable on your system
-    training_mode: true
-    preload:
-        enabled: true
-        from: "./data/models/model1.bin"
-    log: true
-
-  model_parameters:
-    n_levels: 6
+    main_config:
+        python_executable: "python3"
+        n_python_workers: 32
+        training_mode: yes
+        preload:
+            enabled: yes
+            from: "/pretrained/model1.json"
+            error_on_inconsistent_preload: yes
+        save:
+            enabled: yes
+            to: "/user_data/checkpoints/"
+            frequency: 120
+        log:
+            enabled: yes
+            to: "/user_data/logs/"
+            file_name_starts_with: "user_log"
+    
+    model:
+        n_levels: 6
