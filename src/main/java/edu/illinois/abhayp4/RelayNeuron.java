@@ -29,7 +29,7 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
         target1.setMonitor(targetMonitor);
         target2.setMonitor(targetMonitor);
 
-        client = new ModelClient();
+        client = ModelClientService.getService().getAvailableClient();
         thread = new Thread(this);
     }
 
