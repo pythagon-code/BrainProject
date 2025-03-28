@@ -9,7 +9,7 @@ import java.util.ArrayDeque;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
-public final class TextChannel extends NamedObject implements Source, Target {
+final class TextChannel extends NamedObject implements Source, Target {
     private final Queue<String> messages;
     private Object monitor;
     

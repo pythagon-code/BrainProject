@@ -1,10 +1,10 @@
 /**
- * Addable.java
+ * Source.java
  * @author Abhay Pokhriyal
  */
 
 package edu.illinois.abhayp4;
 
-public interface Source {
+interface Source {
     void add(String message);
 }

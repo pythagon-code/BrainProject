@@ -1,9 +1,12 @@
 /**
- * GlobalBehavior.java
+ * GlobalState.java
  * @author Abhay Pokhriyal
  */
 
 package edu.illinois.abhayp4;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public final class GlobalState {
     private static boolean initialized = false;
@@ -22,8 +25,12 @@ public final class GlobalState {
     private static int saveModelFrequency;
     private static boolean logEnabled;
     private static String logTo;
-    private static String logFileNameVerbosity;
+    private static String logFileNamePrefix;
+    private static String logVerbosity;
     private static int nLevels;
+
+    private static int nThreads = 0;
+    private static LocalDateTime timestamp = LocalDateTime.now();
 
     private GlobalState() { }
 
@@ -32,28 +39,34 @@ public final class GlobalState {
             throw new IllegalStateException("GlobalBehavior is already initialized.");
         }
     
-        if (args == null || args.length < 15) {
+        if (args == null || args.length != 17) {
             throw new IllegalArgumentException("Insufficient arguments to initialize GlobalBehavior.");
         }
     
         initialized = true;
 
-        scriptPath = args[0];
-        pythonExecutable = args[1];
-        nPythonWorkers = Integer.parseInt(args[2]);
-        useCuda = Boolean.parseBoolean(args[3]);
-        trainingMode = Boolean.parseBoolean(args[4]);
-        preloadModelEnabled = Boolean.parseBoolean(args[5]);
-        preloadModelFrom = args[6];
-        errorOnInconsistentPreload = Boolean.parseBoolean(args[7]);
-        saveModelEnabled = Boolean.parseBoolean(args[8]);
-        saveModelTo = args[9];
-        saveModelFileNamePrefix = args[10];
-        saveModelFrequency = Integer.parseInt(args[11]);
-        logEnabled = Boolean.parseBoolean(args[12]);
-        logTo = args[13];
-        logFileNameVerbosity = args[14];
-        nLevels = Integer.parseInt(args[15]);
+        int i = 0;
+        scriptPath = args[i++];
+        pythonExecutable = args[i++];
+        nPythonWorkers = Integer.parseInt(args[i++]);
+        useCuda = Boolean.parseBoolean(args[i++]);
+        trainingMode = Boolean.parseBoolean(args[i++]);
+        preloadModelEnabled = Boolean.parseBoolean(args[i++]);
+        preloadModelFrom = args[i++];
+        errorOnInconsistentPreload = Boolean.parseBoolean(args[i++]);
+        saveModelEnabled = Boolean.parseBoolean(args[i++]);
+        saveModelTo = args[i++];
+        saveModelFileNamePrefix = args[i++];
+        saveModelFrequency = Integer.parseInt(args[i++]);
+        logEnabled = Boolean.parseBoolean(args[i++]);
+        logTo = args[i++];
+        logFileNamePrefix = args[i++];
+        logVerbosity = args[i++];
+        nLevels = Integer.parseInt(args[i++]);
+
+        for (int j = 1; j <= nLevels; j++) {
+            nThreads += Math.pow(j, 4);
+        }
     }
 
     static String getScriptPath() {
@@ -112,11 +125,33 @@ public final class GlobalState {
         return logTo;
     }
 
-    static String getLogFileNameVerbosity() {
-        return logFileNameVerbosity;
+    static String getLogFileNamePrefix() {
+        return logFileNamePrefix;
+    }
+
+    static String getLogVerbosity() {
+        return logVerbosity;
     }
 
     static int getNLevels() {
         return nLevels;
+    }
+
+    static int getNThreads() {
+        return nThreads;
+    }
+
+    static void stampTime() {
+        timestamp = LocalDateTime.now();
+    }
+
+    static String getTimestamp() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss z");
+        return timestamp.format(formatter);
+    }
+
+    static String getTimestampNoColons() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH_mm_ss z");
+        return timestamp.format(formatter);
     }
 }

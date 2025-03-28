@@ -20,15 +20,7 @@ import java.io.IOError;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-public final class ModelClient implements Closeable {
-    private static String pythonExecutable, scriptPath;
-
-    public static void initialize(String pythonExec, String script) {
-        pythonExecutable = pythonExec;
-        scriptPath = System.getProperty("user.dir") + script;
-        System.out.println(scriptPath);
-    }
-
+final class ModelClient implements Closeable {
     private final Socket socket;
     private final Process process;
     private final BufferedReader serverIn;
@@ -39,7 +31,8 @@ public final class ModelClient implements Closeable {
             ServerSocket serverSocket = new ServerSocket(0);
             int port = serverSocket.getLocalPort();
 
-            ProcessBuilder pb = new ProcessBuilder(pythonExecutable, scriptPath, Integer.toString(port));
+            ProcessBuilder pb = new ProcessBuilder(
+                GlobalState.getPythonExecutable(), GlobalState.getScriptPath(), Integer.toString(port));
             pb.inheritIO();
             process = pb.start();
 
@@ -48,15 +41,29 @@ public final class ModelClient implements Closeable {
 
             serverIn = new BufferedReader(isr);
             serverOut = new PrintWriter(socket.getOutputStream(), true);
-            
+
             serverSocket.close();
         }
         catch (IOException e) {
             throw new IOError(e);
         }
+
+        initializeClient();
     }
 
-    public int createModel(String modelClass) throws IOException {
+    private void initializeClient() {
+        JSONObject objToSend = new JSONObject();
+        JSONObject args = new JSONObject();
+
+        args.put("UseCuda", GlobalState.shouldUseCuda());
+
+        objToSend.put("Operation", "Initialize");
+        objToSend.put("Arguments", args);
+
+        serverOut.println(objToSend);
+    }
+
+    public int createModel(String modelClass) {
         JSONObject objToSend = new JSONObject();
 
         objToSend.put("Operation", "CreateModel");
@@ -66,7 +73,7 @@ public final class ModelClient implements Closeable {
         return received.getInt("ModelID");
     }
 
-    public Object getOutput(int modelID, String outputType, String input) throws IOException {
+    public Object getOutput(int modelID, String outputType, String input) {
         JSONObject objToSend = new JSONObject();
 
         objToSend.put("Operation", "InvokeModel");
@@ -77,7 +84,7 @@ public final class ModelClient implements Closeable {
         return sendAndReceive(objToSend).get("Output");
     }
 
-    public List<Object> getMultipleOutputs(int modelID, String input) throws IOException {
+    public List<Object> getMultipleOutputs(int modelID, String input) {
         JSONObject objToSend = new JSONObject();
 
         objToSend.put("Operation", "InvokeModel");
@@ -89,13 +96,13 @@ public final class ModelClient implements Closeable {
         return array.toList();
     }
 
-    private synchronized JSONObject sendAndReceive(JSONObject obj) throws IOException {
+    private synchronized JSONObject sendAndReceive(JSONObject obj) {
         serverOut.println(obj);
         try {
             return receive();
         }
         catch (IOException e) {
-            throw new IOException("Client closed.");
+            throw new IOError(e);
         }
     }
 

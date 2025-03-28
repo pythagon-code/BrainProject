@@ -5,7 +5,7 @@
 
 package edu.illinois.abhayp4;
 
-public abstract class NamedObject {
+abstract class NamedObject {
     public String name;
 
     public NamedObject(String name) {

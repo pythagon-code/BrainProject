@@ -5,14 +5,14 @@
 
 package edu.illinois.abhayp4;
 
-public final class MetaNeuron extends RelayNeuron {
+final class MetaNeuron extends RelayNeuron {
     private final RelayNeuron[] neurons;
     private final TextChannel inner14, inner43, inner32, inner21;
     private final TextChannel outer12Src, outer34Src;
     private final TextChannel outer1Tgt, outer2Tgt, outer3Tgt, outer4Tgt;
 
     public MetaNeuron(
-        String name, Addable src1, Addable src2, Removable tgt1, Removable tgt2, int level
+        String name, Source src1, Source src2, Target tgt1, Target tgt2, int level
     ) {
         super(name, src1, src2, tgt1, tgt2);
 

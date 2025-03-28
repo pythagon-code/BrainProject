@@ -8,17 +8,17 @@ package edu.illinois.abhayp4;
 import java.io.Closeable;
 import java.io.IOError;
 
-public abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
+abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
     private final Object targetMonitor;
-    protected final Addable source1, source2;
-    private final Removable target1, target2;
+    protected final Source source1, source2;
+    private final Target target1, target2;
 
     protected final ModelClient client;
     private final Thread thread;
     private boolean closed = false;
 
     public RelayNeuron(
-        String name, Addable src1, Addable src2, Removable tgt1, Removable tgt2
+        String name, Source src1, Source src2, Target tgt1, Target tgt2
     ) {
         super(name);
         targetMonitor = new Object();

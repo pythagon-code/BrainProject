@@ -5,9 +5,9 @@
 
 package edu.illinois.abhayp4;
 
-public final class BaseNeuron extends RelayNeuron {
+final class BaseNeuron extends RelayNeuron {
     public BaseNeuron(
-        String name, Addable src1, Addable src2, Removable tgt1, Removable tgt2
+        String name, Source src1, Source src2, Target tgt1, Target tgt2
     ) {
         super(name, src1, src2, tgt1, tgt2);
     }
