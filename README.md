@@ -1,6 +1,8 @@
-## Brain Project
+# Brain Project
 
 ![Space Invaders Gameplay](media/cosmic-brain-image.jpg)
+
+## Project Overview
 
 The Brain Project aims to create a model to mimic the human brain patterns through the incorporation of AI transformer models that communicate to each other through the use of channels. The project hopes to create a model capable of replicating human emotions.
 
@@ -16,7 +18,6 @@ Before running the game, ensure you have the following installed:
 - [Java Development Kit (JDK) 8 or higher](https://www.oracle.com/java/technologies/javase-downloads.html)
 - [Gradle](https://gradle.org/install/)
 - [Python 3.10 or higher](https://www.python.org/downloads/)
-
 
 To verify, you have all the requirements installed, run:
 ```bash
@@ -37,9 +38,9 @@ Go to `application.yml` and set the variable `python_executable` to the name of 
 \
 If you are using Windows and do not have Bash installed, use `.\gradlew.bat` instead of `./gradlew` for all the next commands.
 
-To build the project, run the following:
+The following command will automatically install Python dependencies and build the project:
 ```bash
-./gradlew run
+./gradlew build
 ```
 
 To start the project, run the following:
@@ -50,6 +51,6 @@ To start the project, run the following:
 ### Clean the project
 
 To remove any generated files and start fresh, run the following:
-```powershell
+```bash
 ./gradlew clean
 ```
