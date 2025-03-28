@@ -49,6 +49,6 @@ final class ModelClientService {
 
 
     private int getNPythonWorkers() {
-        return Math.max(GlobalState.getNPythonWorkers(), GlobalState.getNNeurons());
+        return Math.max(GlobalState.getNPythonWorkers(), GlobalState.getNThreads());
     }
 }
