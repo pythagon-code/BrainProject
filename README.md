@@ -19,7 +19,7 @@ Before running the game, ensure you have the following installed:
 - [Gradle](https://gradle.org/install/)
 - [Python 3.10 or higher](https://www.python.org/downloads/)
 
-To verify, you have all the requirements installed, run:
+To verify you have all the requirements installed, run:
 ```bash
 java --vesion
 javac --version
