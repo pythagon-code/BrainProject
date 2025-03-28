@@ -18,6 +18,7 @@ application:
             enabled: yes
             to: "/user_data/logs/"
             file_name_prefix: "user_log"
+            verbosity: 3
     
     model:
         n_levels: 6
