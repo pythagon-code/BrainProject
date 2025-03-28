@@ -15,16 +15,16 @@ This project uses Gradle to manage dependencies and build tasks.
 ### Prerequisites
 
 Before running the game, ensure you have the following installed:
-- [Java Development Kit (JDK) 8 or higher](https://www.oracle.com/java/technologies/javase-downloads.html)
+- [Java Development Kit (JDK) 14 or higher](https://www.oracle.com/java/technologies/javase-downloads.html)
 - [Gradle](https://gradle.org/install/)
 - [Python 3.10 or higher](https://www.python.org/downloads/)
 
 To verify, you have all the requirements installed, run:
 ```bash
-python3 --version
-java -version
-javac -version
+java --vesion
+javac --version
 gradle --version
+python3 --version
 ```
 
 Clone this project's repository in a desired directory using:
