@@ -58,7 +58,6 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
     @Override
     public void close() {
         closed = true;
-        client.close();
         waitForThreadToEnd(7, null);
     }
 
