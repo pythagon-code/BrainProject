@@ -17,32 +17,39 @@ Before running the game, ensure you have the following installed:
 - [Gradle](https://gradle.org/install/)
 - [Python 3.10 or higher](https://www.python.org/downloads/)
 
-### Build and run the project
 
-Go to `application.yml` and set the variable `python_executable` to the name of the Python command on your system if it is not **`python3`**. Also, note building this project will modify your Python dependencies.
-
-On Windows, run the following:
-```powershell
-.\gradlew.bat build
-.\gradlew.bat run
+To verify, you have all the requirements installed, run:
+```bash
+python3 --version
+java -version
+javac -version
+gradle --version
 ```
 
-On Linux/Mac, instead run the following:
+Clone this project's repository using:
 ```bash
-./gradlew build
+git clone https://github.com/pythagon-code/BrainProject.git
+```
+
+### Build and run the project
+
+Go to `application.yml` and set the variable `python_executable` to the name of the Python command on your system if it is not **`python3`**. Also, note that building this project will modify your Python dependencies.\
+\
+If you are using Windows and do not have Bash installed, use `.\gradlew.bat` instead of `./gradlew` for all the next commands.
+
+To build the project, run the following:
+```bash
 ./gradlew run
 ```
 
-Once you call build, you do need to call build again.
+To start the project, run the following:
+```bash
+./gradlew run
+```
 
 ### Clean the project
 
-To remove any generated files and start fresh, run the following on Windows:
-```powershell
-.\gradlew.bat clean
-```
-
-To clean the project on Linux/Mac, run the following:
+To remove any generated files and start fresh, run the following:
 ```powershell
 ./gradlew clean
 ```
