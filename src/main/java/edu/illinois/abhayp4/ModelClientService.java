@@ -27,22 +27,30 @@ final class ModelClientService {
     }
 
     public synchronized ModelClient getAvailableClient() {
+        if (availableClients.isEmpty()) {
+            throw new IllegalStateException("No available clients remaining.");
+        }
+
         int clientIdx = random.nextInt(availableClients.size());
         ModelClient client = availableClients.get(clientIdx);
         int usage = clientUsage.get(client) + 1;
         clientUsage.put(client, usage);
+
         if (usage == maxThreadsPerClient) {
             availableClients.remove(clientIdx);
         }
+
         return client;
     }
 
     private ModelClientService() {
         maxThreadsPerClient = Math.ceilDiv(GlobalState.getNThreads(), getNPythonWorkers());
         clientUsage = new HashMap<>();
+
         for (int i = 0; i < getNPythonWorkers(); i++) {
             clientUsage.put(new ModelClient(), 0);
         }
+        
         availableClients = new ArrayList<>(clientUsage.keySet());
         random = new Random();
     }
