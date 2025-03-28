@@ -27,9 +27,14 @@ javac -version
 gradle --version
 ```
 
-Clone this project's repository using:
+Clone this project's repository in a desired directory using:
 ```bash
 git clone https://github.com/pythagon-code/BrainProject.git
+```
+
+Go to the project directory through:
+```bash
+cd BrainProject
 ```
 
 ### Build and run the project
