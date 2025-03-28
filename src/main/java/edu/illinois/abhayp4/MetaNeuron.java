@@ -50,6 +50,15 @@ final class MetaNeuron extends RelayNeuron {
         }
         super.run();
     }
+    
+    
+    @Override
+    public void close() {
+        for (RelayNeuron child : neurons) {
+            child.close();
+        }
+        super.close();
+    }
 
     @Override
     protected void onReceiveFromTarget(boolean whichSide, String message) {
