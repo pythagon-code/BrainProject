@@ -2,7 +2,7 @@
 
 ![Space Invaders Gameplay](media/cosmic-brain-image.jpg)
 
-The Brain Project is a model to mimic the human brain patterns through the incorporation of AI transformer models that communicate to each other through the use of channels. The project hopes to create a model capable of replicating human emotions.
+The Brain Project aims to create a model to mimic the human brain patterns through the incorporation of AI transformer models that communicate to each other through the use of channels. The project hopes to create a model capable of replicating human emotions.
 
 The model has multiple neurons, each running as a separate Java thread that invokes a Python client process. Each Python client process communicates with the Java thread through socket programming.
 
