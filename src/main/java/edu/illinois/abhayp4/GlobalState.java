@@ -30,7 +30,7 @@ public final class GlobalState {
     private static int nLevels;
 
     private static int nThreads = 0;
-    private static LocalDateTime timestamp = LocalDateTime.now();
+    private static volatile LocalDateTime timestamp = LocalDateTime.now();
 
     private GlobalState() { }
 
