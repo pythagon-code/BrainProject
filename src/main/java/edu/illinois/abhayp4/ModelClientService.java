@@ -4,10 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.Random;
 
-final class ModelClientService {
+import java.io.Closeable;
+
+final class ModelClientService implements Closeable {
     static ModelClientService service;
 
     private int maxThreadsPerClient;
@@ -43,6 +44,13 @@ final class ModelClientService {
         return client;
     }
 
+    @Override
+    public void close() {
+        for (ModelClient client : clientUsage.keySet()) {
+            client.close();
+        }
+    }
+
     private ModelClientService() {
         maxThreadsPerClient = Math.ceilDiv(GlobalState.getNThreads(), getNPythonWorkers());
         clientUsage = new HashMap<>();
@@ -50,7 +58,7 @@ final class ModelClientService {
         for (int i = 0; i < getNPythonWorkers(); i++) {
             clientUsage.put(new ModelClient(), 0);
         }
-        
+
         availableClients = new ArrayList<>(clientUsage.keySet());
         random = new Random();
     }
