@@ -21,7 +21,7 @@ def sendMessage(client: socket, response: dict) -> None:
     message = json.dumps(response) + "\n"
     client.sendall(message.encode())
 
-async def main() -> None:
+def main() -> None:
     port = int(argv[1])
     client = socket(AF_INET, SOCK_STREAM)
     client.connect(("localhost", port))
