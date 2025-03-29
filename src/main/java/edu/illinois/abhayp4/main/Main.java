@@ -18,7 +18,7 @@ public class Main {
         System.out.println("hello world");
         
         for (int i = 0; i < 100; i++) {
-            ModelClient model = new ModelClient();
+            //ModelClient model = new ModelClient();
             //model.sendAndReceive(new JSONObject("{\"strin\":null}"));
         }
         
