@@ -52,47 +52,47 @@ final class ModelClient implements Closeable {
     }
 
     private void initializeClient() {
-        JSONObject objToSend = new JSONObject();
+        JSONObject dataToSend = new JSONObject();
         JSONObject args = new JSONObject();
 
         args.put("UseCuda", GlobalState.shouldUseCuda());
 
-        objToSend.put("Operation", "Initialize");
-        objToSend.put("Arguments", args);
+        dataToSend.put("Operation", "Initialize");
+        dataToSend.put("Arguments", args);
 
-        serverOut.println(objToSend);
+        serverOut.println(dataToSend);
     }
 
     public int createModel(String modelClass) {
-        JSONObject objToSend = new JSONObject();
+        JSONObject dataToSend = new JSONObject();
 
-        objToSend.put("Operation", "CreateModel");
-        objToSend.put("ModelClass", modelClass);
+        dataToSend.put("Operation", "CreateModel");
+        dataToSend.put("ModelClass", modelClass);
 
-        JSONObject received = sendAndReceive(objToSend);
+        JSONObject received = sendAndReceive(dataToSend);
         return received.getInt("ModelID");
     }
 
     public Object getOutput(int modelID, String outputType, String input) {
-        JSONObject objToSend = new JSONObject();
+        JSONObject dataToSend = new JSONObject();
 
-        objToSend.put("Operation", "InvokeModel");
-        objToSend.put("ModelID", modelID);
-        objToSend.put("OutputType", outputType);
-        objToSend.put("Input", input);
+        dataToSend.put("Operation", "InvokeModel");
+        dataToSend.put("ModelID", modelID);
+        dataToSend.put("OutputType", outputType);
+        dataToSend.put("Input", input);
 
-        return sendAndReceive(objToSend).get("Output");
+        return sendAndReceive(dataToSend).get("Output");
     }
 
     public List<Object> getMultipleOutputs(int modelID, String input) {
-        JSONObject objToSend = new JSONObject();
+        JSONObject dataToSend = new JSONObject();
 
-        objToSend.put("Operation", "InvokeModel");
-        objToSend.put("ModelID", modelID);
-        objToSend.put("OutputType", "Vector");
-        objToSend.put("Input", input);
+        dataToSend.put("Operation", "InvokeModel");
+        dataToSend.put("ModelID", modelID);
+        dataToSend.put("OutputType", "Vector");
+        dataToSend.put("Input", input);
 
-        JSONArray array = sendAndReceive(objToSend).getJSONArray("OutputArray");
+        JSONArray array = sendAndReceive(dataToSend).getJSONArray("OutputArray");
         return array.toList();
     }
 
