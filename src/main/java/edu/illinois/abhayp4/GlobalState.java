@@ -15,7 +15,7 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.IOError;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public final class GlobalState {
@@ -40,7 +40,7 @@ public final class GlobalState {
     private static int nLevels;
 
     private static int nThreads;
-    private static volatile LocalDateTime timestamp;
+    private static volatile ZonedDateTime timestamp;
 
     private static PrintWriter logFile;
 
@@ -50,9 +50,9 @@ public final class GlobalState {
         if (initialized) {
             throw new IllegalStateException("GlobalBehavior is already initialized.");
         }
-    
+
         if (args == null || args.length != 17) {
-            throw new IllegalArgumentException("Insufficient arguments to initialize GlobalBehavior.");
+        //    throw new IllegalArgumentException("Insufficient arguments to initialize GlobalBehavior.");
         }
     
         initialized = true;
@@ -174,7 +174,7 @@ public final class GlobalState {
     }
 
     static void stampTime() {
-        timestamp = LocalDateTime.now();
+        timestamp = ZonedDateTime.now();
     }
 
     static String getTimestamp() {
