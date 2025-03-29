@@ -5,8 +5,11 @@
 
 package edu.illinois.abhayp4;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 final class MetaNeuron extends RelayNeuron {
-    private final RelayNeuron[] neurons;
+    private final RelayNeuron[] children;
     private final TextChannel inner14, inner43, inner32, inner21;
     private final TextChannel outer12Src, outer34Src;
     private final TextChannel outer1Tgt, outer2Tgt, outer3Tgt, outer4Tgt;
@@ -29,23 +32,42 @@ final class MetaNeuron extends RelayNeuron {
         outer3Tgt = new TextChannel(name + "-outer3Tgt");
         outer4Tgt = new TextChannel(name + "-outer4Tgt");
 
-        neurons = new RelayNeuron[4];
+        children = new RelayNeuron[4];
         if (level == 1) {
-            neurons[0] = new BaseNeuron(name + "-1", outer12Src, inner14, outer1Tgt, inner21);
-            neurons[1] = new BaseNeuron(name + "-2", outer12Src, inner21, outer2Tgt, inner32);
-            neurons[2] = new BaseNeuron(name + "-3", outer34Src, inner32, outer3Tgt, inner43);
-            neurons[3] = new BaseNeuron(name + "-4", outer34Src, inner43, outer4Tgt, inner14);
+            children[0] = new BaseNeuron(name + "-1", outer12Src, inner14, outer1Tgt, inner21);
+            children[1] = new BaseNeuron(name + "-2", outer12Src, inner21, outer2Tgt, inner32);
+            children[2] = new BaseNeuron(name + "-3", outer34Src, inner32, outer3Tgt, inner43);
+            children[3] = new BaseNeuron(name + "-4", outer34Src, inner43, outer4Tgt, inner14);
         } else {
-            neurons[0] = new MetaNeuron(name + "-1", outer12Src, inner14, outer1Tgt, inner21, level - 1);
-            neurons[1] = new MetaNeuron(name + "-2", outer12Src, inner21, outer2Tgt, inner32, level - 1);
-            neurons[2] = new MetaNeuron(name + "-3", outer34Src, inner32, outer3Tgt, inner43, level - 1);
-            neurons[3] = new MetaNeuron(name + "-4", outer34Src, inner43, outer4Tgt, inner14, level - 1);
+            children[0] = new MetaNeuron(name + "-1", outer12Src, inner14, outer1Tgt, inner21, level - 1);
+            children[1] = new MetaNeuron(name + "-2", outer12Src, inner21, outer2Tgt, inner32, level - 1);
+            children[2] = new MetaNeuron(name + "-3", outer34Src, inner32, outer3Tgt, inner43, level - 1);
+            children[3] = new MetaNeuron(name + "-4", outer34Src, inner43, outer4Tgt, inner14, level - 1);
         }
     }
 
     @Override
+    protected void deserialize(JSONObject data) {
+        JSONArray childData = data.getJSONArray("Children");
+        for (int i = 0; i < children.length; i++) {
+            children[i].deserialize(childData.getJSONObject(i));
+        }
+    }
+
+    @Override
+    protected JSONObject serialize() {
+        JSONObject result = new JSONObject();
+        JSONArray childData = new JSONArray();
+        for (RelayNeuron child : children) {
+            childData.put(child.serialize());
+        }
+        result.put("Children", childData);
+        return result;
+    }
+
+    @Override
     public void run() {
-        for (RelayNeuron child : neurons) {
+        for (RelayNeuron child : children) {
             child.start();
         }
         super.run();
@@ -54,7 +76,7 @@ final class MetaNeuron extends RelayNeuron {
     
     @Override
     public void close() {
-        for (RelayNeuron child : neurons) {
+        for (RelayNeuron child : children) {
             child.close();
         }
         super.close();

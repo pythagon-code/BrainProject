@@ -8,6 +8,8 @@ package edu.illinois.abhayp4;
 import java.io.Closeable;
 import java.io.IOError;
 
+import org.json.JSONObject;
+
 abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
     private final Object targetMonitor;
     protected final Source source1, source2;
@@ -72,6 +74,10 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
             waitForThreadToEnd(triesLeft - 1, prevException);
         }
     }
+
+    protected abstract void deserialize(JSONObject data);
+
+    protected abstract JSONObject serialize();
 
     protected abstract void onReceiveFromTarget(boolean whichSide, String message);
 }
