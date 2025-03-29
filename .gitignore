@@ -12,8 +12,11 @@
 # Compiled class files
 *.class
 
-# Generated log files
-*.log
+# Generated log files and models
+/user_data/
+
+# Keep info.txt files
+!**/info.txt
 
 # Use this directory for local testing and temporary files
 /local/
