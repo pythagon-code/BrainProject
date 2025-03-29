@@ -5,6 +5,16 @@
 
 package edu.illinois.abhayp4;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+import java.nio.file.Paths;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.IOError;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -26,11 +36,13 @@ public final class GlobalState {
     private static boolean logEnabled;
     private static String logTo;
     private static String logFileNamePrefix;
-    private static String logVerbosity;
+    private static int logVerbosity;
     private static int nLevels;
 
-    private static int nThreads = 0;
-    private static volatile LocalDateTime timestamp = LocalDateTime.now();
+    private static int nThreads;
+    private static volatile LocalDateTime timestamp;
+
+    private static PrintWriter logFile;
 
     private GlobalState() { }
 
@@ -61,11 +73,25 @@ public final class GlobalState {
         logEnabled = Boolean.parseBoolean(args[i++]);
         logTo = args[i++];
         logFileNamePrefix = args[i++];
-        logVerbosity = args[i++];
+        logVerbosity = Integer.parseInt(args[i++]);
         nLevels = Integer.parseInt(args[i++]);
 
+        nThreads = 0;
+        final int SPLIT_FACTOR = 4;
         for (int j = 1; j <= nLevels; j++) {
-            nThreads += Math.pow(j, 4);
+            nThreads += Math.pow(j, SPLIT_FACTOR);
+        }
+
+        stampTime();
+        String logFileName = logFileNamePrefix + " " + getTimestampNoColons() + ".log";
+        String logFilePath = Paths.get(logTo, logFileName).toString();
+        if (logEnabled) {
+            try {
+                logFile = new PrintWriter(logFilePath);
+            }
+            catch (FileNotFoundException e) {
+                logEnabled = false;
+            }
         }
     }
 
@@ -129,7 +155,7 @@ public final class GlobalState {
         return logFileNamePrefix;
     }
 
-    static String getLogVerbosity() {
+    static int getLogVerbosity() {
         return logVerbosity;
     }
 
@@ -139,6 +165,12 @@ public final class GlobalState {
 
     static int getNThreads() {
         return nThreads;
+    }
+
+    static void log(int verbosity, String logMessage) {
+        if (logEnabled && verbosity <= logVerbosity) {
+            logFile.println(logMessage);
+        }
     }
 
     static void stampTime() {
