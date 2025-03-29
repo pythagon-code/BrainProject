@@ -60,7 +60,22 @@ tasks.named('run') {
     doFirst {
         args = [
             '/src/main/python/client.py',
-            application.main_config.python_executable
+            application.main_config.python_executable,
+            application.main_config.n_python_workers,
+            application.main_config.use_cuda,
+            application.main_config.training_mode,
+            application.main_config.preload_model.enabled,
+            application.main_config.preload_model.from,
+            application.main_config.preload_model.error_on_inconsistent_preload,
+            application.main_config.save_model.enabled,
+            application.main_config.save_model.to,
+            application.main_config.save_model.file_name_prefix,
+            application.main_config.save_model.frequency,
+            application.main_config.log.enabled,
+            application.main_config.log.to,
+            application.main_config.log.file_name_prefix,
+            application.main_config.log.verbosity,
+            application.model.n_levels
         ]
     }
 }
