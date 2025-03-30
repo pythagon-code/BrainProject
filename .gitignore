@@ -1,19 +1,17 @@
 # Gradle output and cache
 /.gradle/
+/bin/
 /build/
 
 # Generic output
-/bin/
 /out/
 
 # VS Code specific
 /.vscode/
 
-# Compiled class files
-*.class
-
-# Generated log files and models
-/user_data/
+# Generated models and log files
+/user_data/checkpoints/*
+/user_data/logs/*
 
 # Keep info.txt files
 !**/info.txt
