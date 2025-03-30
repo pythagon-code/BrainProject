@@ -7,17 +7,17 @@ application:
         training_mode: yes
         preload_model:
             enabled: yes
-            from: "/pretrained/model1.json"
+            from: "./pretrained/model1.json"
             error_on_inconsistent_preload: yes
         save_model:
             enabled: yes
-            to: "/user_data/checkpoints/"
-            file_name_prefix: "user_checkpoint"
+            to: "./user_data/checkpoints/"
+            file_name_prefix: "user-checkpoint"
             frequency: 120
         log:
             enabled: yes
-            to: "/user_data/logs/"
-            file_name_prefix: "user_log"
+            to: "./user_data/logs/"
+            file_name_prefix: "user-log"
             verbosity: 3
     
     model:

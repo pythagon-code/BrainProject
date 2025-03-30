@@ -59,7 +59,7 @@ task installPythonDependencies {
 tasks.named('run') {
     doFirst {
         args = [
-            '/src/main/python/client.py',
+            './src/main/python/client.py',
             application.main_config.python_executable,
             application.main_config.n_python_workers,
             application.main_config.use_cuda,
