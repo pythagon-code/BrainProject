@@ -11,7 +11,7 @@ import java.io.IOError;
 import org.json.JSONObject;
 
 abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
-    private final Object targetMonitor;
+    private final Object receiveSignal;
     protected final Source source1, source2;
     private final Target target1, target2;
 
@@ -23,13 +23,13 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
         String name, Source src1, Source src2, Target tgt1, Target tgt2
     ) {
         super(name);
-        targetMonitor = new Object();
+        receiveSignal = new Object();
         source1 = src1;
         source2 = src2;
         target1 = tgt1;
         target2 = tgt2;
-        target1.setMonitor(targetMonitor);
-        target2.setMonitor(targetMonitor);
+        target1.setReceiveSignal(receiveSignal);
+        target2.setReceiveSignal(receiveSignal);
 
         client = ModelClientService.getService().getAvailableClient();
         thread = new Thread(this);
@@ -42,9 +42,9 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
     @Override
     public void run() {
         do {
-            synchronized (targetMonitor) {
+            synchronized (receiveSignal) {
                 try {
-                    targetMonitor.wait();
+                    receiveSignal.wait();
                     if (target1.hasMessage()) {
                         onReceiveFromTarget(false, target1.remove());
                     }
@@ -52,7 +52,9 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
                         onReceiveFromTarget(true, target2.remove());
                     }
                 }
-                catch (InterruptedException e) { }
+                catch (InterruptedException e) {
+                    GlobalState.waitForResumeSignal();
+                }
             }
         } while (!closed);
     }
