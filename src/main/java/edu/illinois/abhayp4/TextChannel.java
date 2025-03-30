@@ -11,7 +11,7 @@ import java.util.Queue;
 
 final class TextChannel extends NamedObject implements Source, Target {
     private final Queue<String> messages;
-    private Object monitor;
+    private Object receiveSignal;
     
     TextChannel(String name) {
         super(name);
@@ -19,25 +19,25 @@ final class TextChannel extends NamedObject implements Source, Target {
     }
 
     @Override
-    public void setMonitor(Object monitor) {
-        if (this.monitor != null) {
+    public void setReceiveSignal(Object receiveSignal) {
+        if (this.receiveSignal != null) {
             throw new IllegalStateException("Monitor already exists.");
         }
 
-        this.monitor = monitor;
+        this.receiveSignal = receiveSignal;
     }
 
     @Override
     public void add(String message) {
-        synchronized (monitor) {
+        synchronized (receiveSignal) {
             messages.add(message);
-            monitor.notifyAll();
+            receiveSignal.notifyAll();
         }
     }
 
     @Override
     public boolean hasMessage() {
-        if (!Thread.holdsLock(monitor)) {
+        if (!Thread.holdsLock(receiveSignal)) {
             throw new IllegalMonitorStateException("Thread must hold monitor lock for this operation.");
         }
 
@@ -46,7 +46,7 @@ final class TextChannel extends NamedObject implements Source, Target {
 
     @Override
     public String remove() {
-        if (!Thread.holdsLock(monitor)) {
+        if (!Thread.holdsLock(receiveSignal)) {
             throw new IllegalMonitorStateException("Thread must hold monitor lock for this operation.");
         }
 
