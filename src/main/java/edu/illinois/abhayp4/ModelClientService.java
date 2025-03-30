@@ -34,6 +34,7 @@ final class ModelClientService implements Closeable {
 
         int clientIdx = random.nextInt(availableClients.size());
         ModelClient client = availableClients.get(clientIdx);
+        
         int usage = clientUsage.get(client) + 1;
         clientUsage.put(client, usage);
 

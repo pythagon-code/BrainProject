@@ -54,8 +54,9 @@ public final class GlobalState {
             throw new IllegalStateException("GlobalBehavior is already initialized.");
         }
 
-        if (args == null || args.length != 17) {
-        //    throw new IllegalArgumentException("Insufficient arguments to initialize GlobalBehavior.");
+        final int N_ARGS = 17;
+        if (args == null || args.length != N_ARGS) {
+            throw new IllegalArgumentException("Insufficient arguments to initialize GlobalBehavior.");
         }
     
         initialized = true;
@@ -94,6 +95,7 @@ public final class GlobalState {
             }
             catch (FileNotFoundException e) {
                 logEnabled = false;
+                System.err.println("Your log file path is incorrect. Please modify it in application.yml.");
             }
         }
     }
