@@ -83,6 +83,7 @@ public final class GlobalState {
         stampTime();
         String logFileName = logFileNamePrefix + " " + getTimestampNoColons() + ".log";
         String logFilePath = Paths.get(logTo, logFileName).toString();
+        System.out.println(logFilePath);
         if (logEnabled) {
             try {
                 logFile = new PrintWriter(logFilePath);
