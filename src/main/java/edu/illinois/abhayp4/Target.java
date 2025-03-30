@@ -6,7 +6,7 @@
 package edu.illinois.abhayp4;
 
 interface Target {
-    void setMonitor(Object monitor);
+    void setReceiveSignal(Object signal);
     boolean hasMessage();
     String remove();
 }
