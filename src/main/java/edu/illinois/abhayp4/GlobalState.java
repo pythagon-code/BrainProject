@@ -10,6 +10,7 @@ import java.util.Queue;
 
 import java.nio.file.Paths;
 import java.io.FileNotFoundException;
+
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -41,6 +42,8 @@ public final class GlobalState {
 
     private static int nThreads;
     private static volatile ZonedDateTime timestamp;
+    private static volatile boolean resumed = false;
+    private static final Object resumeSignal = new Object();
 
     private static PrintWriter logFile;
 
@@ -185,5 +188,18 @@ public final class GlobalState {
     static String getTimestampNoColons() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH_mm_ss z");
         return timestamp.format(formatter);
+    }
+
+    static void waitForResumeSignal() {
+        synchronized (resumeSignal) {
+            while (!resumed) {
+                try {
+                    resumeSignal.wait();
+                }
+                catch (InterruptedException e) {
+                    throw new IllegalThreadStateException("Cannot be interrupted while waiting for resume signal.");
+                }
+            }
+        }
     }
 }
