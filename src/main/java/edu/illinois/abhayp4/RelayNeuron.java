@@ -62,18 +62,15 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
     @Override
     public void close() {
         closed = true;
-        waitForThreadToEnd(7, null);
+        waitForThreadToEnd();
     }
 
-    private void waitForThreadToEnd(int triesLeft, Throwable prevException) {
-        if (triesLeft == 0) {
-            throw new IOError(prevException);
-        }
+    private void waitForThreadToEnd() {
         try {
             thread.join();
         }
         catch (InterruptedException e) {
-            waitForThreadToEnd(triesLeft - 1, prevException);
+            throw new IllegalThreadStateException("Cannot interrupt during neuron close.");
         }
     }
 
