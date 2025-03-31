@@ -73,12 +73,31 @@ final class ModelClient implements Closeable {
         return received.getInt("ModelID");
     }
 
-    public Object getOutput(int modelID, String outputType, String input) {
+    public void deserializeModel(int modelID, String encodedData) {
+        JSONObject dataToSend = new JSONObject();
+
+        dataToSend.put("Operation", "DeserializeModel");
+        dataToSend.put("ModelID", modelID);
+        dataToSend.put("Input", encodedData);
+
+        serverOut.println(dataToSend);
+    }
+    
+    public String serializeModel(int modelID) {
+        JSONObject dataToSend = new JSONObject();
+
+        dataToSend.put("Operation", "SerializeModel");
+        dataToSend.put("ModelID", modelID);
+
+        return sendAndReceive(dataToSend).getString("Output");
+    }
+
+    public Object getOutput(int modelID, String input) {
         JSONObject dataToSend = new JSONObject();
 
         dataToSend.put("Operation", "InvokeModel");
         dataToSend.put("ModelID", modelID);
-        dataToSend.put("OutputType", outputType);
+        dataToSend.put("OutputType", "Single");
         dataToSend.put("Input", input);
 
         return sendAndReceive(dataToSend).get("Output");
@@ -89,7 +108,7 @@ final class ModelClient implements Closeable {
 
         dataToSend.put("Operation", "InvokeModel");
         dataToSend.put("ModelID", modelID);
-        dataToSend.put("OutputType", "Vector");
+        dataToSend.put("OutputType", "Multiple");
         dataToSend.put("Input", input);
 
         JSONArray array = sendAndReceive(dataToSend).getJSONArray("OutputArray");
@@ -132,13 +151,10 @@ final class ModelClient implements Closeable {
             }
         }
 
-        waitForProccessToExit(7, null);
+        waitForProccessToExit();
     }
 
-    private void waitForProccessToExit(int triesLeft, Throwable prevException) {
-        if (triesLeft == 0) {
-            throw new IOError(prevException);
-        }
+    private void waitForProccessToExit() {
         try {
             int exitCode = process.waitFor();
             if (exitCode != 0) {
@@ -146,7 +162,7 @@ final class ModelClient implements Closeable {
             }
         }
         catch (InterruptedException e) {
-            waitForProccessToExit(triesLeft - 1, e);
+            throw new IllegalThreadStateException("Cannot interrupt during client close.");
         }
     }
 }
