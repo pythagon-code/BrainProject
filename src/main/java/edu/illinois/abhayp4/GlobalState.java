@@ -81,7 +81,7 @@ public final class GlobalState {
         }
 
         stampTime();
-        String logFileName = logFileNamePrefix + " " + getTimestampNoColons() + ".log";
+        String logFileName = logFileNamePrefix + getTimestampNoColons() + ".log";
         String logFilePath = Paths.get(logTo, logFileName).toString();
         System.out.println(logFilePath);
         if (logEnabled) {
@@ -178,12 +178,12 @@ public final class GlobalState {
     }
 
     static String getTimestamp() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss z");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
         return timestamp.format(formatter);
     }
 
     static String getTimestampNoColons() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH_mm_ss z");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH_mm_ss z");
         return timestamp.format(formatter);
     }
 
@@ -197,6 +197,13 @@ public final class GlobalState {
                     throw new IllegalThreadStateException("Cannot be interrupted while waiting for resume signal.");
                 }
             }
+        }
+    }
+
+    static void resume() {
+        synchronized (resumeSignal) {
+            resumed = true;
+            resumeSignal.notifyAll();
         }
     }
 }
