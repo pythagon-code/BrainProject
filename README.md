@@ -21,7 +21,7 @@ Before running the game, ensure you have the following installed:
 
 To verify you have all the requirements installed, run:
 ```bash
-java --vesion
+java --version
 javac --version
 gradle --version
 python3 --version
