@@ -79,8 +79,10 @@ final class ModelClient implements Closeable {
         dataToSend.put("Operation", "DeserializeModel");
         dataToSend.put("ModelID", modelID);
         dataToSend.put("Input", encodedData);
-
-        serverOut.println(dataToSend);
+        
+        synchronized (this) {
+            serverOut.println(dataToSend);
+        }
     }
     
     public String serializeModel(int modelID) {
