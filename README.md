@@ -47,6 +47,7 @@ The following command will automatically install Python dependencies and build t
 ```bash
 ./gradlew build
 ```
+You should call the build command every time you change `python_executable` within `application.yml`.
 
 To start the project, run the following:
 ```bash
