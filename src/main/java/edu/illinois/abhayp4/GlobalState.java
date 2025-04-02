@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public final class GlobalState {
     private static boolean initialized = false;
@@ -105,6 +106,7 @@ public final class GlobalState {
         }
         else {
             JSONObject checkpoint = getPreloadCheckpoint();
+            System.out.println(checkpoint.toString(4));
             nLevels = checkpoint.getJSONObject("Model").getInt("NLevels");
         }
 
@@ -277,7 +279,7 @@ public final class GlobalState {
         try (PrintWriter writer = new PrintWriter(checkpointFilePath)) {
             final int INDENT_SIZE = 4;
             writer.println(checkpoint.toString(INDENT_SIZE));
-            log(LogVerbosity.HIGH, "Checkpoint saved to: " + checkpointFilePath);
+            log(LogVerbosity.HIGH, "Checkpoint saved to: " + checkpointFilePath.replace('\\', '/'));
             
         }
         catch (FileNotFoundException e) {
@@ -294,10 +296,10 @@ public final class GlobalState {
             StringBuilder jsonString = new StringBuilder();
 
             while (reader.ready()) {
-                jsonString.append(reader.readLine());
+                jsonString.append(reader.readLine() + "\n");
             }
 
-            return new JSONObject(jsonString);
+            return new JSONObject(jsonString.toString());
         }
         catch (FileNotFoundException e) {
             throw new IllegalStateException("Preload file path is incorrect. Please modify it in application.yml.");
