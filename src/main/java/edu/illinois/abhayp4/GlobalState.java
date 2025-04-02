@@ -6,12 +6,15 @@
 package edu.illinois.abhayp4;
 
 import java.nio.file.Paths;
-import java.io.FileNotFoundException;
 
+import java.io.File;
 import java.io.PrintWriter;
+import java.io.FileNotFoundException;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+
+import org.json.JSONObject;
 
 public final class GlobalState {
     private static boolean initialized = false;
@@ -38,6 +41,7 @@ public final class GlobalState {
     private static volatile ZonedDateTime timestamp;
     private static volatile boolean resumed = false;
     private static final Object resumeSignal = new Object();
+    private static String checkpointsFolderName;
 
     private static PrintWriter logFile;
 
@@ -72,6 +76,7 @@ public final class GlobalState {
         logTo = args[i++];
         logFileNamePrefix = args[i++];
         logVerbosity = Integer.parseInt(args[i++]);
+        
         nLevels = Integer.parseInt(args[i++]);
 
         nThreads = 0;
@@ -93,6 +98,13 @@ public final class GlobalState {
                 System.err.println("Your log file path is incorrect. Please modify it in application.yml.");
             }
         }
+
+        checkpointsFolderName = Paths.get(saveModelTo, getTimestampNoColons()).toString();
+        File checkpointsFolder = new File(checkpointsFolderName);
+        checkpointsFolder.mkdirs();
+
+        // Test
+        createNewCheckpoint(new JSONObject("{ \"Test\": \"Test\" }"));
     }
 
     static String getScriptPath() {
@@ -204,6 +216,19 @@ public final class GlobalState {
         synchronized (resumeSignal) {
             resumed = true;
             resumeSignal.notifyAll();
+        }
+    }
+
+    static void createNewCheckpoint(JSONObject checkpoint) {
+        String checkpointFileName = saveModelFileNamePrefix + getTimestampNoColons() + ".json";
+        String checkpointFilePath = Paths.get(checkpointsFolderName, checkpointFileName).toString();
+        
+        try (PrintWriter writer = new PrintWriter(checkpointFilePath)) {
+            final int INDENT_SIZE = 4;
+            writer.println(checkpoint.toString(INDENT_SIZE));
+        }
+        catch (FileNotFoundException e) {
+            throw new IllegalStateException("Checkpoint folder was illegally deleted.");
         }
     }
 }
