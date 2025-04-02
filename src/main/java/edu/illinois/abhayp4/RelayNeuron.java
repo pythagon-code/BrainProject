@@ -6,7 +6,6 @@
 package edu.illinois.abhayp4;
 
 import java.io.Closeable;
-import java.io.IOError;
 
 import org.json.JSONObject;
 
