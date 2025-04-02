@@ -9,7 +9,11 @@ import java.nio.file.Paths;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.IOError;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,7 +38,7 @@ public final class GlobalState {
     private static boolean logEnabled;
     private static String logTo;
     private static String logFileNamePrefix;
-    private static int logVerbosity;
+    private static LogVerbosity logVerbosity;
     private static int nLevels;
 
     private static int nThreads;
@@ -44,6 +48,25 @@ public final class GlobalState {
     private static String checkpointsFolderName;
 
     private static PrintWriter logFile;
+
+    enum LogVerbosity{
+        LOW,
+        MEDIUM,
+        HIGH;
+
+        public static LogVerbosity get(int level) {
+            switch (level) {
+                case 1:
+                    return LOW;
+                case 2:
+                    return MEDIUM;
+                case 3:
+                    return HIGH;
+                default:
+                    throw new IllegalArgumentException("LogVerbosity must be from 1 to 3.");
+            }
+        }
+    };
 
     private GlobalState() { }
 
@@ -75,9 +98,15 @@ public final class GlobalState {
         logEnabled = Boolean.parseBoolean(args[i++]);
         logTo = args[i++];
         logFileNamePrefix = args[i++];
-        logVerbosity = Integer.parseInt(args[i++]);
+        logVerbosity = LogVerbosity.get(Integer.parseInt(args[i++]));
         
-        nLevels = Integer.parseInt(args[i++]);
+        if (!preloadModelEnabled) {
+            nLevels = Integer.parseInt(args[i++]);
+        }
+        else {
+            JSONObject checkpoint = getPreloadCheckpoint();
+            nLevels = checkpoint.getJSONObject("Model").getInt("NLevels");
+        }
 
         nThreads = 0;
         final int SPLIT_FACTOR = 4;
@@ -86,10 +115,10 @@ public final class GlobalState {
         }
 
         stampTime();
-        String logFileName = logFileNamePrefix + getTimestampNoColons() + ".log";
-        String logFilePath = Paths.get(logTo, logFileName).toString();
-        System.out.println(logFilePath);
         if (logEnabled) {
+            String logFileName = logFileNamePrefix + getTimestampNoColons() + ".log";
+            String logFilePath = Paths.get(logTo, logFileName).toString();
+            System.out.println("Log file path: " + logFilePath);
             try {
                 logFile = new PrintWriter(logFilePath);
             }
@@ -99,107 +128,114 @@ public final class GlobalState {
             }
         }
 
-        checkpointsFolderName = Paths.get(saveModelTo, getTimestampNoColons()).toString();
-        File checkpointsFolder = new File(checkpointsFolderName);
-        checkpointsFolder.mkdirs();
+        if (saveModelEnabled) {
+            checkpointsFolderName = Paths.get(saveModelTo, getTimestampNoColons()).toString();
+            File checkpointsFolder = new File(checkpointsFolderName);
+            checkpointsFolder.mkdirs();
+            System.out.println("Checkpoints folder path:" + checkpointsFolderName);
+        }
 
         // Test
-        createNewCheckpoint(new JSONObject("{ \"Test\": \"Test\" }"));
+        try {
+            Thread.sleep(1000);
+            } catch (Exception e) {}
+        makeCheckpoint(new JSONObject("{ \"Test\": \"Test\" }"));
     }
 
-    static String getScriptPath() {
+    public static String getScriptPath() {
         return scriptPath;
     }
 
-    static String getPythonExecutable() {
+    public static String getPythonExecutable() {
         return pythonExecutable;
     }
 
-    static int getNPythonWorkers() {
+    public static int getNPythonWorkers() {
         return nPythonWorkers;
     }
 
-    static boolean shouldUseCuda() {
+    public static boolean shouldUseCuda() {
         return useCuda;
     }
 
-    static boolean isTrainingMode() {
+    public static boolean isTrainingMode() {
         return trainingMode;
     }
 
-    static boolean isPreloadModelEnabled() {
+    public static boolean isPreloadModelEnabled() {
         return preloadModelEnabled;
     }
 
-    static String getPreloadModelFrom() {
+    public static String getPreloadModelFrom() {
         return preloadModelFrom;
     }
 
-    static boolean shouldErrorOnInconsistentPreload() {
+    public static boolean shouldErrorOnInconsistentPreload() {
         return errorOnInconsistentPreload;
     }
 
-    static boolean isSaveModelEnabled() {
+    public static boolean isSaveModelEnabled() {
         return saveModelEnabled;
     }
 
-    static String getSaveModelTo() {
+    public static String getSaveModelTo() {
         return saveModelTo;
     }
 
-    static String getSaveModelFileNamePrefix() {
+    public static String getSaveModelFileNamePrefix() {
         return saveModelFileNamePrefix;
     }
 
-    static int getSaveModelFrequency() {
+    public static int getSaveModelFrequency() {
         return saveModelFrequency;
     }
 
-    static boolean isLogEnabled() {
+    public static boolean isLogEnabled() {
         return logEnabled;
     }
 
-    static String getLogTo() {
+    public static String getLogTo() {
         return logTo;
     }
 
-    static String getLogFileNamePrefix() {
+    public static String getLogFileNamePrefix() {
         return logFileNamePrefix;
     }
 
-    static int getLogVerbosity() {
+    public static LogVerbosity getLogVerbosity() {
         return logVerbosity;
     }
 
-    static int getNLevels() {
+    public static int getNLevels() {
         return nLevels;
     }
 
-    static int getNThreads() {
+    public static int getNThreads() {
         return nThreads;
     }
 
-    static void log(int verbosity, String logMessage) {
-        if (logEnabled && verbosity <= logVerbosity) {
+    public static void log(LogVerbosity verbosity, String logMessage) {
+        if (logEnabled && verbosity.compareTo(logVerbosity) >= 0) {
             logFile.println(logMessage);
+            logFile.flush();
         }
     }
 
-    static void stampTime() {
+    public static void stampTime() {
         timestamp = ZonedDateTime.now();
     }
 
-    static String getTimestamp() {
+    public static String getTimestamp() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
         return timestamp.format(formatter);
     }
 
-    static String getTimestampNoColons() {
+    public static String getTimestampNoColons() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH_mm_ss z");
         return timestamp.format(formatter);
     }
 
-    static void waitForResumeSignal() {
+    public static void waitForResumeSignal() {
         synchronized (resumeSignal) {
             while (!resumed) {
                 try {
@@ -212,23 +248,62 @@ public final class GlobalState {
         }
     }
 
-    static void resume() {
+    public static void resume() {
         synchronized (resumeSignal) {
             resumed = true;
             resumeSignal.notifyAll();
         }
     }
 
-    static void createNewCheckpoint(JSONObject checkpoint) {
+    public static void makeCheckpoint(JSONObject data) {
+        stampTime();
+        
+        if (!saveModelEnabled) {
+            throw new IllegalStateException("Cannot make checkpoint as save model not enabled.");
+        }
+
+        JSONObject checkpoint = new JSONObject();
+        checkpoint.put("Timestamp", getTimestamp());
+
+        JSONObject modelParameters = new JSONObject();
+        modelParameters.put("NLevels", nLevels);
+        
+        checkpoint.put("Model", modelParameters);
+        checkpoint.put("Data", data);
+
         String checkpointFileName = saveModelFileNamePrefix + getTimestampNoColons() + ".json";
         String checkpointFilePath = Paths.get(checkpointsFolderName, checkpointFileName).toString();
         
         try (PrintWriter writer = new PrintWriter(checkpointFilePath)) {
             final int INDENT_SIZE = 4;
             writer.println(checkpoint.toString(INDENT_SIZE));
+            log(LogVerbosity.HIGH, "Checkpoint saved to: " + checkpointFilePath);
+            
         }
         catch (FileNotFoundException e) {
             throw new IllegalStateException("Checkpoint folder was illegally deleted.");
+        }
+    }
+
+    public static JSONObject getPreloadCheckpoint() {
+        if (!preloadModelEnabled) {
+            throw new IllegalStateException("Cannot preload checkpoint as preload model is not enabled.");
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(preloadModelFrom))) {
+            StringBuilder jsonString = new StringBuilder();
+
+            while (reader.ready()) {
+                jsonString.append(reader.readLine());
+            }
+
+            return new JSONObject(jsonString);
+        }
+        catch (FileNotFoundException e) {
+            throw new IllegalStateException("Preload file path is incorrect. Please modify it in application.yml.");
+        }
+        catch (IOException e) {
+            throw new IOError(e);
         }
     }
 }
