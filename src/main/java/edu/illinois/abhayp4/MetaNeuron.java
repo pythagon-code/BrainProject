@@ -86,12 +86,12 @@ final class MetaNeuron extends RelayNeuron {
     protected void onReceiveFromTarget(boolean whichSide, String message) {
         // Will incorporate switch logic later
         if (!whichSide) {
-            outer1Tgt.add(message);
-            outer4Tgt.add(message);
+            outer1Tgt.enqueue(message);;
+            outer4Tgt.enqueue(message);
         }
         else {
-            outer2Tgt.add(message);
-            outer3Tgt.add(message);
+            outer2Tgt.enqueue(message);
+            outer3Tgt.enqueue(message);
         }
     }
 }

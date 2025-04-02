@@ -46,10 +46,10 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
                 try {
                     receiveSignal.wait();
                     if (target1.hasMessage()) {
-                        onReceiveFromTarget(false, target1.remove());
+                        onReceiveFromTarget(false, target1.dequeue());
                     }
                     else if (target2.hasMessage()) {
-                        onReceiveFromTarget(true, target2.remove());
+                        onReceiveFromTarget(true, target2.dequeue());
                     }
                 }
                 catch (InterruptedException e) {

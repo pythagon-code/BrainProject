@@ -28,7 +28,7 @@ final class TextChannel extends NamedObject implements Source, Target {
     }
 
     @Override
-    public void add(String message) {
+    public void enqueue(String message) {
         synchronized (receiveSignal) {
             messages.add(message);
             receiveSignal.notifyAll();
@@ -45,7 +45,7 @@ final class TextChannel extends NamedObject implements Source, Target {
     }
 
     @Override
-    public String remove() {
+    public String dequeue() {
         if (!Thread.holdsLock(receiveSignal)) {
             throw new IllegalMonitorStateException("Thread must hold monitor lock for this operation.");
         }
