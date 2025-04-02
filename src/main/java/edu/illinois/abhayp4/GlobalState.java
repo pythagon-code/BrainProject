@@ -19,7 +19,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public final class GlobalState {
     private static boolean initialized = false;
@@ -266,7 +265,7 @@ public final class GlobalState {
 
         JSONObject checkpoint = new JSONObject();
         checkpoint.put("Timestamp", getTimestamp());
-
+        
         JSONObject modelParameters = new JSONObject();
         modelParameters.put("NLevels", nLevels);
         
