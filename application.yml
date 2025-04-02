@@ -1,24 +1,38 @@
-# Note the application is not complete, so most of these values are not being used
 application:
+    # Main configuration for the application
     main_config:
-        python_executable: "python3"
-        n_python_workers: 32
-        use_cuda: yes
-        training_mode: yes
+        python_executable: python3   # Python executable name 
+        n_python_workers: 32  # Number of Python processes to invoke
+        use_cuda: yes  # Use CUDA for GPU acceleration
+        training_allowed: yes  # Allow training
         preload_model:
-            enabled: no
-            from: "./pretrained/model1.json"
-            error_on_inconsistent_preload: yes
-        save_model:
-            enabled: yes
-            to: "./user_data/checkpoints/"
-            file_name_prefix: ""
-            frequency: 120
+            enabled: no  # Preload a model or initialize a new one
+            from: ./user_data/pretrained/model1.json  # File path to the model file
+            error_on_inconcsistent_preload: yes  # Error if the model parameters are inconsistent, otherise, don't preload
+            error_on_different_optimization: no  # Error if the optimization parameters are different, otherwise, train with new parameters
+        save_checkpoints:
+            enabled: yes  # Save model checkpoints frequently
+            to: ./user_data/checkpoints/  # Folder path to save checkpoints
+            file_name_prefix:  # File name prefix for checkpoints
+            frequency: 120  # Frequency of saving checkpoints in seconds
         log:
-            enabled: yes
-            to: "./user_data/logs/"
-            file_name_prefix: ""
-            verbosity: 3
+            enabled: yes  # Enable logging
+            to: ./user_data/logs/  # Folder path to save logs
+            file_name_prefix:  # File name prefix for logs
+            verbosity: 3  # Verbosity level for logging (1-3)
     
+    # Configuration for changing the behavior of the model
     model:
-        n_levels: 6
+        n_levels: 4  # Number of levels of the model (Each level except the lowest one has subneurons)
+        neuron_activity_control:
+            goal: 0.1  # Target activity level for neurons (0-1, choosing a high value can cause CPU overload, depending on the numnber of levels)
+            upward_effect:
+                force: 0.2  # Force to increase the activity of neurons when goal is exceeded (0-1)
+                easing: 0.5  # Easing factor for the upward force (0-1)
+            downward_effect:
+                force: 0.2  # Force to decrease the activity of neurons when goal is not reached (0-1)
+                easing: 0.4  # Easing factor for the downward force (0-1)
+    
+    # Configuration for the learning process
+    optimization:
+        
