@@ -43,7 +43,7 @@ application:
                 types:  # List of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
                     - DistilBERT
                     - T5-Small
-                probabilities:  # Probabilities for selecting each type of transformer type (sum must be 1.0)
+                probabilities:  # Probabilities for selecting each transformer model (sum must be 1.0)
                     - 0.5  # DistilBERT
                     - 0.5  # T5-Small
         memory_unit:
@@ -53,7 +53,7 @@ application:
                 types:  # List of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
                     - DistilBERT
                     - T5-Small
-                probabilities:  # Probabilities for selecting each type of transformer type (sum must be 1.0)
+                probabilities:  # Probabilities for selecting each transformer model (sum must be 1.0)
                     - 0.5  # DistilBERT
                     - 0.5  # T5-Small
         base_neuron:
@@ -65,7 +65,7 @@ application:
                     - T5
                     - XLNET
                     - BART
-                probabilities:  # Probabilities for selecting each type of transformer type (sum must be 1.0)
+                probabilities:  # Probabilities for selecting each transformer model (sum must be 1.0)
                     - 0.3  # GPT2
                     - 0.3  # GPT2
                     - 0.1  # RoBERTA
