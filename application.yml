@@ -40,7 +40,7 @@ application:
                 max: 20  # Maximum delay for transmitting information between neurons (milliseconds)
             max_message_length: 16  # Maximum length of messages transmitted between neurons (# of words)
             binary_output_transformer:
-                types:  # List of types of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
+                types:  # List of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
                     - DistilBERT
                     - T5-Small
                 probabilities:  # Probabilities for selecting each type of transformer type (sum must be 1.0)
@@ -50,7 +50,7 @@ application:
             capacity: 1024  # Maximum memory storage capacity for each neuron (# of characters)
             max_append_length: 5  # Maximum length of summary to append to memory for each neuron (# of words)
             summary_transformer:
-                types:  # List of types of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
+                types:  # List of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
                     - DistilBERT
                     - T5-Small
                 probabilities:  # Probabilities for selecting each type of transformer type (sum must be 1.0)
@@ -58,7 +58,7 @@ application:
                     - 0.5  # T5-Small
         base_neuron:
             base_transformer:
-                types:  # List of types of transformer models to randomly select from (GPT2/BERT/RoBERTA/T5/XLNET/BART)
+                types:  # List of transformer models to randomly select from (GPT2/BERT/RoBERTA/T5/XLNET/BART)
                     - GPT2
                     - BERT
                     - RoBERTA
