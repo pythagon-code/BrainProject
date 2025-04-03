@@ -43,9 +43,9 @@ application:
                 types:  # List of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
                     - DistilBERT
                     - T5-Small
-                probabilities:  # Probabilities for selecting each transformer model (sum must be 1.0)
-                    - 0.5  # DistilBERT
-                    - 0.5  # T5-Small
+                weights:  # Frequencies for selecting each transformer model
+                    - 1  # DistilBERT
+                    - 1  # T5-Small
         memory_unit:
             capacity: 1024  # Maximum memory storage capacity for each neuron (# of characters)
             max_append_length: 5  # Maximum length of summary to append to memory for each neuron (# of words)
@@ -53,9 +53,9 @@ application:
                 types:  # List of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
                     - DistilBERT
                     - T5-Small
-                probabilities:  # Probabilities for selecting each transformer model (sum must be 1.0)
-                    - 0.5  # DistilBERT
-                    - 0.5  # T5-Small
+                weights:  # Frequencies for selecting each transformer model
+                    - 1  # DistilBERT
+                    - 1  # T5-Small
         base_neuron:
             base_transformer:
                 types:  # List of transformer models to randomly select from (GPT2/BERT/RoBERTA/T5/XLNET/BART)
@@ -65,13 +65,13 @@ application:
                     - T5
                     - XLNET
                     - BART
-                probabilities:  # Probabilities for selecting each transformer model (sum must be 1.0)
-                    - 0.3  # GPT2
-                    - 0.3  # GPT2
-                    - 0.1  # RoBERTA
-                    - 0.1  # T5
-                    - 0.1  # XLNET
-                    - 0.1  # BART
+                weights:  # Frequencies for selecting each transformer model
+                    - 5  # GPT2
+                    - 5  # GPT2
+                    - 2  # RoBERTA
+                    - 2  # T5
+                    - 2  # XLNET
+                    - 2  # BART
     
     # Configuration for the training process (if training is allowed)
     optimization:
