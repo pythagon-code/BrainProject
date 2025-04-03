@@ -5,7 +5,7 @@ application:
         n_python_workers: 32  # Number of Python processes to invoke
         use_cuda: yes  # Use CUDA for GPU acceleration if CUDA is available
         cuda_device: 0  # CUDA device ID to use (0 for the first GPU, 1 for the second, etc.)
-        training_allowed: yes  # Allow training
+        training_allowed: yes  # Allow model to train
         preload_model:
             enabled: no  # Preload a model or initialize a new one
             from: ./user_data/pretrained/model1.json  # File path to the model file
@@ -24,6 +24,7 @@ application:
     
     # Configuration for the behavior of the model
     model:
+        random_seed: 42  # Random seed for deterministic random parameters
         n_levels: 4  # Number of levels of the model (Each level except the lowest one has subneurons)
         neuron_activity_control:
             goal: 0.1  # Target activity level for neurons (0-1, choosing a high value can cause CPU overload, depending on the numnber of levels)
@@ -33,18 +34,50 @@ application:
             downward_effect:
                 force: 0.2  # Force to decrease the activity of neurons when goal is not reached (0-1)
                 easing: 0.4  # Easing factor for the downward force (0-1)
-        synaptic_delay:
-            min: 10  # Minimum delay for transmitting information between neurons (milliseconds)
-            max: 20  # Maximum delay for transmitting information between neurons (milliseconds)
+        transmission:
+            synaptic_delay:
+                min: 10  # Minimum delay for transmitting information between neurons (milliseconds)
+                max: 20  # Maximum delay for transmitting information between neurons (milliseconds)
+            max_message_length: 16  # Maximum length of messages transmitted between neurons (# of words)
+            binary_output_transformer:
+                types:  # List of types of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
+                    - DistilBERT
+                    - T5-Small
+                probabilities:  # Probabilities for selecting each type of transformer type (sum must be 1.0)
+                    - 0.5  # DistilBERT
+                    - 0.5  # T5-Small
         memory_unit:
             capacity: 1024  # Maximum memory storage capacity for each neuron (# of characters)
-            summary_max_length: 5  # Maximum length of appened summary for each neuron (# of words)
+            max_append_length: 5  # Maximum length of summary to append to memory for each neuron (# of words)
+            summary_transformer:
+                types:  # List of types of transformer models to randomly select from (DistilBERT/TinyBERT/ALBERT/T5-Small/GPT2-Small)
+                    - DistilBERT
+                    - T5-Small
+                probabilities:  # Probabilities for selecting each type of transformer type (sum must be 1.0)
+                    - 0.5  # DistilBERT
+                    - 0.5  # T5-Small
+        base_neuron:
+            text_transformer:
+                types:  # List of types of transformer models to randomly select from (GPT2/BERT/RoBERTA/T5/XLNET/BART)
+                    - GPT2
+                    - BERT
+                    - RoBERTA
+                    - T5
+                    - XLNET
+                    - BART
+                probabilities:  # Probabilities for selecting each type of transformer type (sum must be 1.0)
+                    - 0.3  # GPT2
+                    - 0.3  # GPT2
+                    - 0.1  # RoBERTA
+                    - 0.1  # T5
+                    - 0.1  # XLNET
+                    - 0.1  # BART
     
     # Configuration for the training process (if training is allowed)
     optimization:
         type: Adam  # Type of optimization algorithm (Adam/SGD/RMSProp/Adagrad)
         learning_rate: 0.001  # Learning rate for training
-        alpha: ~ # Alpha parameter for training ("~" for default value or 0.9)
-        beta: ~ # Beta parameter for training ("~" for default value or 0.999)
+        alpha: ~ # Alpha parameter for training (0-1, "~" for default value or 0.9)
+        beta: ~ # Beta parameter for training (0-1, "~" for default value or 0.999)
         batch_size: 32  # Batch size for training
         replay_memory: 1024  # Size of the replay memory (# of samples)
