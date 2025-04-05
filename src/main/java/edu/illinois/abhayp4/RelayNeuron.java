@@ -69,7 +69,7 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
             thread.join();
         }
         catch (InterruptedException e) {
-            throw new IllegalThreadStateException("Cannot interrupt during neuron close.");
+            throw new IllegalThreadStateException("Cannot interrupt during neuron close");
         }
     }
 

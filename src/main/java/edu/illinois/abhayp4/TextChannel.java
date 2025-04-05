@@ -21,7 +21,7 @@ final class TextChannel extends NamedObject implements Source, Target {
     @Override
     public void setReceiveSignal(Object receiveSignal) {
         if (this.receiveSignal != null) {
-            throw new IllegalStateException("Monitor already exists.");
+            throw new IllegalStateException("Monitor already exists");
         }
 
         this.receiveSignal = receiveSignal;
@@ -38,7 +38,7 @@ final class TextChannel extends NamedObject implements Source, Target {
     @Override
     public boolean hasMessage() {
         if (!Thread.holdsLock(receiveSignal)) {
-            throw new IllegalMonitorStateException("Thread must hold monitor lock for this operation.");
+            throw new IllegalMonitorStateException("Thread must hold monitor lock for this operation");
         }
 
         return !messages.isEmpty();
@@ -47,11 +47,11 @@ final class TextChannel extends NamedObject implements Source, Target {
     @Override
     public String dequeue() {
         if (!Thread.holdsLock(receiveSignal)) {
-            throw new IllegalMonitorStateException("Thread must hold monitor lock for this operation.");
+            throw new IllegalMonitorStateException("Thread must hold monitor lock for this operation");
         }
 
         if (!hasMessage()) {
-            throw new NoSuchElementException("No messages.");
+            throw new NoSuchElementException("No messages in queue");
         }
 
         return messages.remove();

@@ -2,6 +2,7 @@ package edu.illinois.abhayp4;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -29,7 +30,7 @@ final class ModelClientService implements Closeable {
 
     public synchronized ModelClient getAvailableClient() {
         if (availableClients.isEmpty()) {
-            throw new IllegalStateException("No available clients remaining.");
+            throw new NoSuchElementException("No available clients remaining");
         }
 
         int clientIdx = random.nextInt(availableClients.size());
@@ -53,7 +54,7 @@ final class ModelClientService implements Closeable {
     }
 
     private ModelClientService() {
-        maxThreadsPerClient = Math.ceilDiv(GlobalState.getNThreads(), getNPythonWorkers());
+        maxThreadsPerClient = Math.ceilDiv(GlobalState.getNNeuronThreads(), getNPythonWorkers());
         clientUsage = new HashMap<>();
 
         for (int i = 0; i < getNPythonWorkers(); i++) {
@@ -66,6 +67,6 @@ final class ModelClientService implements Closeable {
 
 
     private int getNPythonWorkers() {
-        return Math.max(GlobalState.getNPythonWorkers(), GlobalState.getNThreads());
+        return Math.max(GlobalState.getNPythonWorkers(), GlobalState.getNNeuronThreads());
     }
 }

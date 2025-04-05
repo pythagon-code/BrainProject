@@ -10,6 +10,8 @@ import java.net.Socket;
 
 import java.util.List;
 
+import java.util.concurrent.CompletableFuture;
+
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -25,6 +27,7 @@ final class ModelClient implements Closeable {
     private final Process process;
     private final BufferedReader serverIn;
     private final PrintWriter serverOut;
+    private Long timestamp = null;
 
     public ModelClient() {
         try {
@@ -61,6 +64,33 @@ final class ModelClient implements Closeable {
         dataToSend.put("Arguments", args);
 
         serverOut.println(dataToSend);
+    }
+
+    public void startRound() {
+        try {
+            serverIn.skip(Long.MAX_VALUE);
+        }
+        catch (IOException e) {
+            throw new IOError(e);
+        }
+        
+        JSONObject dataToSend = new JSONObject();
+
+        dataToSend.put("Operation", "StartRound");
+        
+        synchronized (this) {
+            serverOut.println(dataToSend);
+        }
+    }
+    
+    public void endRound() {
+        JSONObject dataToSend = new JSONObject();
+
+        dataToSend.put("Operation", "EndRound");
+        
+        synchronized (this) {
+            serverOut.println(dataToSend);
+        }
     }
 
     public int createModel(String modelClass) {
@@ -117,6 +147,10 @@ final class ModelClient implements Closeable {
         return array.toList();
     }
 
+    private JSONObject sendAndReceiveBatched(JSONObject obj) {
+        serverOut.println(obj);
+    }
+
     private synchronized JSONObject sendAndReceive(JSONObject obj) {
         serverOut.println(obj);
         try {
@@ -136,6 +170,7 @@ final class ModelClient implements Closeable {
     }
     
 
+    @Override
     public synchronized void close() {
         serverOut.println(JSONObject.NULL);
 
@@ -164,7 +199,7 @@ final class ModelClient implements Closeable {
             }
         }
         catch (InterruptedException e) {
-            throw new IllegalThreadStateException("Cannot interrupt during client close.");
+            throw new IllegalThreadStateException("Cannot interrupt during client close");
         }
     }
 }

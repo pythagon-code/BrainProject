@@ -41,7 +41,7 @@ public final class GlobalState {
     private static LogVerbosity logVerbosity;
     private static int nLevels;
 
-    private static int nThreads;
+    private static int nNeuronThreads;
     private static volatile ZonedDateTime timestamp;
     private static volatile boolean resumed = false;
     private static final Object resumeSignal = new Object();
@@ -63,7 +63,7 @@ public final class GlobalState {
                 case 3:
                     return HIGH;
                 default:
-                    throw new IllegalArgumentException("LogVerbosity must be from 1 to 3.");
+                    throw new IllegalArgumentException("LogVerbosity must be from 1 to 3");
             }
         }
     };
@@ -72,12 +72,12 @@ public final class GlobalState {
 
     public static void initialize(String[] args) {
         if (initialized) {
-            throw new IllegalStateException("GlobalBehavior is already initialized.");
+            throw new IllegalStateException("GlobalBehavior is already initialized");
         }
 
         final int N_ARGS = 17;
         if (args == null || args.length != N_ARGS) {
-            throw new IllegalArgumentException("Insufficient arguments to initialize GlobalBehavior.");
+            throw new IllegalArgumentException("Insufficient arguments to initialize GlobalBehavior");
         }
     
         initialized = true;
@@ -109,10 +109,10 @@ public final class GlobalState {
             nLevels = checkpoint.getJSONObject("Model").getInt("NLevels");
         }
 
-        nThreads = 0;
+        nNeuronThreads = 0;
         final int SPLIT_FACTOR = 4;
         for (int j = 1; j <= nLevels; j++) {
-            nThreads += Math.pow(j, SPLIT_FACTOR);
+            nNeuronThreads += Math.pow(j, SPLIT_FACTOR);
         }
 
         stampTime();
@@ -211,8 +211,8 @@ public final class GlobalState {
         return nLevels;
     }
 
-    public static int getNThreads() {
-        return nThreads;
+    public static int getNNeuronThreads() {
+        return nNeuronThreads;
     }
 
     public static void log(LogVerbosity verbosity, String logMessage) {
