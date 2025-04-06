@@ -7,12 +7,12 @@ package edu.illinois.abhayp4;
 
 import com.fasterxml.jackson.annotation.*;
 
-@JsonAutoDetect(fieldVisibility = Visibility.ANY)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 final class MetaNeuron extends RelayNeuron {
-    @JsonProperty("Children")
-    private final RelayNeuron[] children;
+    @JsonProperty("Children") private final RelayNeuron[] children;
     
-    private final TextChannel inner14, inner43, inner32, inner21;
+    private final TextChannel inner14;
+    private final TextChannel inner43, inner32, inner21;
     private final TextChannel outer12Src, outer34Src;
     private final TextChannel outer1Tgt, outer2Tgt, outer3Tgt, outer4Tgt;
 

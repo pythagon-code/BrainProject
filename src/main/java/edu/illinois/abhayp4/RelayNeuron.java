@@ -7,8 +7,10 @@ package edu.illinois.abhayp4;
 
 import java.io.Closeable;
 
+import com.fasterxml.jackson.annotation.*;
+
 abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
-    private final Object receiveSignal;
+    @JsonIgnore private final Object receiveSignal;
     protected final Source source1, source2;
     private final Target target1, target2;
 

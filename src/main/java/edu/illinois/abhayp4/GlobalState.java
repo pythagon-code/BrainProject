@@ -9,18 +9,12 @@ import java.nio.file.Paths;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.io.FileReader;
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.IOError;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.json.JSONObject;
-
-public final class GlobalState {
+final class GlobalState {
     public class ModelParameters {
         
     }
@@ -112,9 +106,9 @@ public final class GlobalState {
             nLevels = Integer.parseInt(args[i++]);
         }
         else {
-            JSONObject checkpoint = getPreloadCheckpoint();
-            System.out.println(checkpoint.toString(4));
-            nLevels = checkpoint.getJSONObject("Model").getInt("NLevels");
+            //JSONObject checkpoint = getPreloadCheckpoint();
+            //System.out.println(checkpoint.toString(4));
+            //nLevels = checkpoint.getJSONObject("Model").getInt("NLevels");
         }
 
         nNeuronThreads = 0;
@@ -148,7 +142,7 @@ public final class GlobalState {
         try {
             Thread.sleep(1000);
             } catch (Exception e) {}
-        makeCheckpoint(new JSONObject("{ \"Test\": \"Test\" }"));
+        //makeCheckpoint(new JSONObject("{ \"Test\": \"Test\" }"));
     }
 
     public static String getScriptPath() {
@@ -264,7 +258,7 @@ public final class GlobalState {
         }
     }
 
-    public static void makeCheckpoint(JSONObject data) {
+    /**public static void makeCheckpoint(JSONObject data) {
         stampTime();
         
         if (!saveModelEnabled) {
@@ -314,5 +308,5 @@ public final class GlobalState {
         catch (IOException e) {
             throw new IOError(e);
         }
-    }
+    }*/
 }
