@@ -41,7 +41,7 @@ public final class GlobalState {
     private static LogVerbosity logVerbosity;
     private static int nLevels;
 
-    private static int nThreads;
+    private static int nNeuronThreads;
     private static volatile ZonedDateTime timestamp;
     private static volatile boolean resumed = false;
     private static final Object resumeSignal = new Object();
@@ -109,10 +109,10 @@ public final class GlobalState {
             nLevels = checkpoint.getJSONObject("Model").getInt("NLevels");
         }
 
-        nThreads = 0;
+        nNeuronThreads = 0;
         final int SPLIT_FACTOR = 4;
         for (int j = 1; j <= nLevels; j++) {
-            nThreads += Math.pow(j, SPLIT_FACTOR);
+            nNeuronThreads += Math.pow(j, SPLIT_FACTOR);
         }
 
         stampTime();
@@ -211,8 +211,8 @@ public final class GlobalState {
         return nLevels;
     }
 
-    public static int getNThreads() {
-        return nThreads;
+    public static int getNNeuronThreads() {
+        return nNeuronThreads;
     }
 
     public static void log(LogVerbosity verbosity, String logMessage) {
