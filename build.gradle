@@ -1,17 +1,6 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'org.yaml:snakeyaml:2.3'
-    }
-}
-
 plugins {
     id 'java'
     id 'application'
-    id 'groovy'
 }
 
 group 'edu.illinois.abhayp4'
@@ -23,7 +12,7 @@ repositories {
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
-    implementation 'org.json:json:20240303'
+    implementation 'org.yaml:snakeyaml:2.3'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.18.0'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.0'
@@ -32,59 +21,3 @@ dependencies {
 application {
     mainClass = 'edu.illinois.abhayp4.main.Main'
 }
-
-test {
-    useJUnitPlatform()
-}
-
-def application
-
-task loadApplicationYml {
-    def yaml = new org.yaml.snakeyaml.Yaml()
-    application = yaml.load(new File('application.yml').text).application
-    println application
-}
-
-task installPythonDependencies {
-    def pythonExec = application.main_config.python_executable
-
-    doLast {
-        exec {
-            commandLine pythonExec, '-m', 'pip', 'install', '--upgrade', 'pip'
-        }
-
-        exec {
-            commandLine pythonExec, '-m', 'pip', 'install', '-r', 'requirements.txt'
-        }
-    }
-}
-
-tasks.named('run') {
-    doFirst {
-        args = [
-            './src/main/python/client.py',
-            application.main_config.python_executable,
-            application.main_config.n_python_workers,
-            application.main_config.use_cuda,
-            application.main_config.training_allowed,
-            application.main_config.preload_model.enabled,
-            application.main_config.preload_model.from, // fix
-            application.main_config.preload_model.error_on_inconsistent_model,
-            application.main_config.save_checkpoints.enabled,
-            application.main_config.save_checkpoints.to,
-            application.main_config.save_checkpoints.file_name_prefix.toString(),
-            application.main_config.save_checkpoints.frequency,
-            application.main_config.log.enabled,
-            application.main_config.log.to,
-            application.main_config.log.file_name_prefix.toString(),
-            application.main_config.log.verbosity,
-            application.model.n_levels
-        ]
-    }
-}
-
-installPythonDependencies.dependsOn loadApplicationYml
-
-build.dependsOn installPythonDependencies
-
-run.dependsOn loadApplicationYml
