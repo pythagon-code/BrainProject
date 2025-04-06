@@ -45,6 +45,7 @@ python3 -m pip install -r requirements.txt
 \
 If you are using Windows, you should use `.\gradlew.bat` instead of `./gradlew` for all the next commands.
 \
+\
 The following command will automatically install Python dependencies and build the project:
 ```bash
 ./gradlew build
