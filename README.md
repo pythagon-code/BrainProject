@@ -40,8 +40,13 @@ cd BrainProject
 ### Build and run the project
 
 Go to `application.yml` and set the variable `python_executable` to the name of the Python command on your system if it is not **`python3`**. Also, note that building this project will modify your Python dependencies.\
+
+Also install the essential Python dependencies through the command:
+```bash
+python3 -m pip install -r requirements.txt
+```
 \
-If you are using Windows and do not have Bash installed, use `.\gradlew.bat` instead of `./gradlew` for all the next commands.
+If you are using Windows, you should use `.\gradlew.bat` instead of `./gradlew` for all the next commands.
 
 The following command will automatically install Python dependencies and build the project:
 ```bash
