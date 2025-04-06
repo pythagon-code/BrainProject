@@ -7,8 +7,6 @@ package edu.illinois.abhayp4;
 
 import java.io.Closeable;
 
-import org.json.JSONObject;
-
 abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
     private final Object receiveSignal;
     protected final Source source1, source2;
@@ -31,7 +29,8 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
         target2.setReceiveSignal(receiveSignal);
 
         client = ModelClientService.getService().getAvailableClient();
-        thread = new Thread(this);
+        thread = new Thread(this, this + "-Thread");
+        thread.setDaemon(false);
     }
 
     public void start() {
@@ -72,10 +71,6 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
             throw new IllegalThreadStateException("Cannot interrupt during neuron close");
         }
     }
-
-    protected abstract void deserialize(JSONObject data);
-
-    protected abstract JSONObject serialize();
 
     protected abstract void onReceiveFromTarget(boolean whichSide, String message);
 }

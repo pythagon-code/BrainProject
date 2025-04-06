@@ -17,11 +17,5 @@ public class Main {
             //ModelClient model = new ModelClient();
             //model.sendAndReceive(new JSONObject("{\"strin\":null}"));
         }
-        
-        System.out.println("hello world");
-
-        while (true) {
-
-        }
     }
 }

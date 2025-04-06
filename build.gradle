@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
-    implementation 'org.json:json:20230618'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.0'
 }
 
 application {
@@ -63,14 +63,14 @@ tasks.named('run') {
             application.main_config.python_executable,
             application.main_config.n_python_workers,
             application.main_config.use_cuda,
-            application.main_config.training_mode,
+            application.main_config.training_allowed,
             application.main_config.preload_model.enabled,
-            application.main_config.preload_model.from,
-            application.main_config.preload_model.error_on_inconsistent_preload,
-            application.main_config.save_model.enabled,
-            application.main_config.save_model.to,
-            application.main_config.save_model.file_name_prefix,
-            application.main_config.save_model.frequency,
+            application.main_config.preload_model.from, // fix
+            application.main_config.preload_model.error_on_inconsistent_model,
+            application.main_config.save_checkpoints.enabled,
+            application.main_config.save_checkpoints.to,
+            application.main_config.save_checkpoints.file_name_prefix,
+            application.main_config.save_checkpoints.frequency,
             application.main_config.log.enabled,
             application.main_config.log.to,
             application.main_config.log.file_name_prefix,

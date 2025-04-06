@@ -5,11 +5,15 @@
 
 package edu.illinois.abhayp4;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.JsonProperty;
+import com.fasterxml.jackson.JsonCreator;
+import com.fasterxml.jackson.JsonGetter;
+import com.fasterxml.jackson.JsonSetter;
 
 final class MetaNeuron extends RelayNeuron {
+    @JsonProperty("Children")
     private final RelayNeuron[] children;
+    
     private final TextChannel inner14, inner43, inner32, inner21;
     private final TextChannel outer12Src, outer34Src;
     private final TextChannel outer1Tgt, outer2Tgt, outer3Tgt, outer4Tgt;
@@ -44,25 +48,6 @@ final class MetaNeuron extends RelayNeuron {
             children[2] = new MetaNeuron(name + "-3", outer34Src, inner32, outer3Tgt, inner43, level - 1);
             children[3] = new MetaNeuron(name + "-4", outer34Src, inner43, outer4Tgt, inner14, level - 1);
         }
-    }
-
-    @Override
-    protected void deserialize(JSONObject data) {
-        JSONArray childData = data.getJSONArray("Children");
-        for (int i = 0; i < children.length; i++) {
-            children[i].deserialize(childData.getJSONObject(i));
-        }
-    }
-
-    @Override
-    protected JSONObject serialize() {
-        JSONObject result = new JSONObject();
-        JSONArray childData = new JSONArray();
-        for (RelayNeuron child : children) {
-            childData.put(child.serialize());
-        }
-        result.put("Children", childData);
-        return result;
     }
 
     @Override
