@@ -5,18 +5,20 @@
 
 package edu.illinois.abhayp4;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-
 import java.nio.file.Paths;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
+
+import java.io.File;
 import java.io.PrintWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.IOError;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+
+import org.json.JSONObject;
 
 public final class GlobalState {
     private static boolean initialized = false;
@@ -36,13 +38,35 @@ public final class GlobalState {
     private static boolean logEnabled;
     private static String logTo;
     private static String logFileNamePrefix;
-    private static int logVerbosity;
+    private static LogVerbosity logVerbosity;
     private static int nLevels;
 
     private static int nThreads;
-    private static volatile LocalDateTime timestamp;
+    private static volatile ZonedDateTime timestamp;
+    private static volatile boolean resumed = false;
+    private static final Object resumeSignal = new Object();
+    private static String checkpointsFolderName;
 
     private static PrintWriter logFile;
+
+    enum LogVerbosity{
+        LOW,
+        MEDIUM,
+        HIGH;
+
+        public static LogVerbosity get(int level) {
+            switch (level) {
+                case 1:
+                    return LOW;
+                case 2:
+                    return MEDIUM;
+                case 3:
+                    return HIGH;
+                default:
+                    throw new IllegalArgumentException("LogVerbosity must be from 1 to 3.");
+            }
+        }
+    };
 
     private GlobalState() { }
 
@@ -51,8 +75,9 @@ public final class GlobalState {
             throw new IllegalStateException("GlobalBehavior is already initialized.");
         }
 
-        if (args == null || args.length != 17) {
-        //    throw new IllegalArgumentException("Insufficient arguments to initialize GlobalBehavior.");
+        final int N_ARGS = 17;
+        if (args == null || args.length != N_ARGS) {
+            throw new IllegalArgumentException("Insufficient arguments to initialize GlobalBehavior.");
         }
     
         initialized = true;
@@ -73,8 +98,16 @@ public final class GlobalState {
         logEnabled = Boolean.parseBoolean(args[i++]);
         logTo = args[i++];
         logFileNamePrefix = args[i++];
-        logVerbosity = Integer.parseInt(args[i++]);
-        nLevels = Integer.parseInt(args[i++]);
+        logVerbosity = LogVerbosity.get(Integer.parseInt(args[i++]));
+        
+        if (!preloadModelEnabled) {
+            nLevels = Integer.parseInt(args[i++]);
+        }
+        else {
+            JSONObject checkpoint = getPreloadCheckpoint();
+            System.out.println(checkpoint.toString(4));
+            nLevels = checkpoint.getJSONObject("Model").getInt("NLevels");
+        }
 
         nThreads = 0;
         final int SPLIT_FACTOR = 4;
@@ -83,107 +116,195 @@ public final class GlobalState {
         }
 
         stampTime();
-        String logFileName = logFileNamePrefix + " " + getTimestampNoColons() + ".log";
-        String logFilePath = Paths.get(logTo, logFileName).toString();
         if (logEnabled) {
+            String logFileName = logFileNamePrefix + getTimestampNoColons() + ".log";
+            String logFilePath = Paths.get(logTo, logFileName).toString();
+            System.out.println("Log file path: " + logFilePath);
             try {
                 logFile = new PrintWriter(logFilePath);
             }
             catch (FileNotFoundException e) {
                 logEnabled = false;
+                System.err.println("Your log file path is incorrect. Please modify it in application.yml.");
+            }
+        }
+
+        if (saveModelEnabled) {
+            checkpointsFolderName = Paths.get(saveModelTo, getTimestampNoColons()).toString();
+            File checkpointsFolder = new File(checkpointsFolderName);
+            checkpointsFolder.mkdirs();
+            System.out.println("Checkpoints folder path:" + checkpointsFolderName);
+        }
+
+        // Test
+        try {
+            Thread.sleep(1000);
+            } catch (Exception e) {}
+        makeCheckpoint(new JSONObject("{ \"Test\": \"Test\" }"));
+    }
+
+    public static String getScriptPath() {
+        return scriptPath;
+    }
+
+    public static String getPythonExecutable() {
+        return pythonExecutable;
+    }
+
+    public static int getNPythonWorkers() {
+        return nPythonWorkers;
+    }
+
+    public static boolean shouldUseCuda() {
+        return useCuda;
+    }
+
+    public static boolean isTrainingMode() {
+        return trainingMode;
+    }
+
+    public static boolean isPreloadModelEnabled() {
+        return preloadModelEnabled;
+    }
+
+    public static String getPreloadModelFrom() {
+        return preloadModelFrom;
+    }
+
+    public static boolean shouldErrorOnInconsistentPreload() {
+        return errorOnInconsistentPreload;
+    }
+
+    public static boolean isSaveModelEnabled() {
+        return saveModelEnabled;
+    }
+
+    public static String getSaveModelTo() {
+        return saveModelTo;
+    }
+
+    public static String getSaveModelFileNamePrefix() {
+        return saveModelFileNamePrefix;
+    }
+
+    public static int getSaveModelFrequency() {
+        return saveModelFrequency;
+    }
+
+    public static boolean isLogEnabled() {
+        return logEnabled;
+    }
+
+    public static String getLogTo() {
+        return logTo;
+    }
+
+    public static String getLogFileNamePrefix() {
+        return logFileNamePrefix;
+    }
+
+    public static LogVerbosity getLogVerbosity() {
+        return logVerbosity;
+    }
+
+    public static int getNLevels() {
+        return nLevels;
+    }
+
+    public static int getNThreads() {
+        return nThreads;
+    }
+
+    public static void log(LogVerbosity verbosity, String logMessage) {
+        if (logEnabled && verbosity.compareTo(logVerbosity) >= 0) {
+            logFile.println(logMessage);
+            logFile.flush();
+        }
+    }
+
+    public static void stampTime() {
+        timestamp = ZonedDateTime.now();
+    }
+
+    public static String getTimestamp() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+        return timestamp.format(formatter);
+    }
+
+    public static String getTimestampNoColons() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH_mm_ss z");
+        return timestamp.format(formatter);
+    }
+
+    public static void waitForResumeSignal() {
+        synchronized (resumeSignal) {
+            while (!resumed) {
+                try {
+                    resumeSignal.wait();
+                }
+                catch (InterruptedException e) {
+                    throw new IllegalThreadStateException("Cannot be interrupted while waiting for resume signal.");
+                }
             }
         }
     }
 
-    static String getScriptPath() {
-        return scriptPath;
-    }
-
-    static String getPythonExecutable() {
-        return pythonExecutable;
-    }
-
-    static int getNPythonWorkers() {
-        return nPythonWorkers;
-    }
-
-    static boolean shouldUseCuda() {
-        return useCuda;
-    }
-
-    static boolean isTrainingMode() {
-        return trainingMode;
-    }
-
-    static boolean isPreloadModelEnabled() {
-        return preloadModelEnabled;
-    }
-
-    static String getPreloadModelFrom() {
-        return preloadModelFrom;
-    }
-
-    static boolean shouldErrorOnInconsistentPreload() {
-        return errorOnInconsistentPreload;
-    }
-
-    static boolean isSaveModelEnabled() {
-        return saveModelEnabled;
-    }
-
-    static String getSaveModelTo() {
-        return saveModelTo;
-    }
-
-    static String getSaveModelFileNamePrefix() {
-        return saveModelFileNamePrefix;
-    }
-
-    static int getSaveModelFrequency() {
-        return saveModelFrequency;
-    }
-
-    static boolean isLogEnabled() {
-        return logEnabled;
-    }
-
-    static String getLogTo() {
-        return logTo;
-    }
-
-    static String getLogFileNamePrefix() {
-        return logFileNamePrefix;
-    }
-
-    static int getLogVerbosity() {
-        return logVerbosity;
-    }
-
-    static int getNLevels() {
-        return nLevels;
-    }
-
-    static int getNThreads() {
-        return nThreads;
-    }
-
-    static void log(int verbosity, String logMessage) {
-        if (logEnabled && verbosity <= logVerbosity) {
-            logFile.println(logMessage);
+    public static void resume() {
+        synchronized (resumeSignal) {
+            resumed = true;
+            resumeSignal.notifyAll();
         }
     }
 
-    static void stampTime() {
-        timestamp = LocalDateTime.now();
+    public static void makeCheckpoint(JSONObject data) {
+        stampTime();
+        
+        if (!saveModelEnabled) {
+            throw new IllegalStateException("Cannot make checkpoint as save model not enabled.");
+        }
+
+        JSONObject checkpoint = new JSONObject();
+        checkpoint.put("Timestamp", getTimestamp());
+        
+        JSONObject modelParameters = new JSONObject();
+        modelParameters.put("NLevels", nLevels);
+        
+        checkpoint.put("Model", modelParameters);
+        checkpoint.put("Data", data);
+
+        String checkpointFileName = saveModelFileNamePrefix + getTimestampNoColons() + ".json";
+        String checkpointFilePath = Paths.get(checkpointsFolderName, checkpointFileName).toString();
+        
+        try (PrintWriter writer = new PrintWriter(checkpointFilePath)) {
+            final int INDENT_SIZE = 4;
+            writer.println(checkpoint.toString(INDENT_SIZE));
+            log(LogVerbosity.HIGH, "Checkpoint saved to: " + checkpointFilePath.replace('\\', '/'));
+            
+        }
+        catch (FileNotFoundException e) {
+            throw new IllegalStateException("Checkpoint folder was illegally deleted.");
+        }
     }
 
-    static String getTimestamp() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss z");
-        return timestamp.format(formatter);
-    }
+    public static JSONObject getPreloadCheckpoint() {
+        if (!preloadModelEnabled) {
+            throw new IllegalStateException("Cannot preload checkpoint as preload model is not enabled.");
+        }
 
-    static String getTimestampNoColons() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH_mm_ss z");
-        return timestamp.format(formatter);
+        try (BufferedReader reader = new BufferedReader(new FileReader(preloadModelFrom))) {
+            StringBuilder jsonString = new StringBuilder();
+
+            while (reader.ready()) {
+                jsonString.append(reader.readLine() + "\n");
+            }
+
+            return new JSONObject(jsonString.toString());
+        }
+        catch (FileNotFoundException e) {
+            throw new IllegalStateException("Preload file path is incorrect. Please modify it in application.yml.");
+        }
+        catch (IOException e) {
+            throw new IOError(e);
+        }
     }
 }
