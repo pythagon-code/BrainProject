@@ -38,10 +38,7 @@ cd BrainProject
 ```
 
 ### Build and run the project
-
-Go to `application.yml` and set the variable `python_executable` to the name of the Python command on your system if it is not **`python3`**. Also, note that building this project will modify your Python dependencies.
-
-Also install the essential Python dependencies through the command:
+Install the essential Python dependencies through the command:
 ```bash
 python3 -m pip install -r requirements.txt
 ```
