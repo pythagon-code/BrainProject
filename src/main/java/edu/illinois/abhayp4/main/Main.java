@@ -5,17 +5,13 @@
 
 package edu.illinois.abhayp4.main;
 
-import edu.illinois.abhayp4.*;
+import edu.illinois.abhayp4.Application;
 
 public class Main {
     public static void main(String[] args) {
-        GlobalState.initialize(args);
-
-        System.out.println("hello world");
+        System.out.println(System.getProperty("user.dir"));
         
-        for (int i = 0; i < 100; i++) {
-            //ModelClient model = new ModelClient();
-            //model.sendAndReceive(new JSONObject("{\"strin\":null}"));
-        }
+        Application app = new Application();
+        app.start();
     }
 }
