@@ -21,6 +21,14 @@ import java.time.format.DateTimeFormatter;
 import org.json.JSONObject;
 
 public final class GlobalState {
+    public class ModelParameters {
+        
+    }
+
+    public class OptimizationParameters {
+
+    }
+
     private static boolean initialized = false;
     
     private static String scriptPath;
@@ -43,7 +51,7 @@ public final class GlobalState {
 
     private static int nNeuronThreads;
     private static volatile ZonedDateTime timestamp;
-    private static volatile boolean resumed = false;
+    private static boolean resumed = false;
     private static final Object resumeSignal = new Object();
     private static String checkpointsFolderName;
 
@@ -243,7 +251,7 @@ public final class GlobalState {
                     resumeSignal.wait();
                 }
                 catch (InterruptedException e) {
-                    throw new IllegalThreadStateException("Cannot be interrupted while waiting for resume signal.");
+                    throw new IllegalThreadStateException("Cannot be interrupted while waiting for resume signal");
                 }
             }
         }
@@ -260,7 +268,7 @@ public final class GlobalState {
         stampTime();
         
         if (!saveModelEnabled) {
-            throw new IllegalStateException("Cannot make checkpoint as save model not enabled.");
+            throw new IllegalStateException("Cannot make checkpoint as save model not enabled");
         }
 
         JSONObject checkpoint = new JSONObject();
@@ -282,13 +290,13 @@ public final class GlobalState {
             
         }
         catch (FileNotFoundException e) {
-            throw new IllegalStateException("Checkpoint folder was illegally deleted.");
+            throw new IllegalStateException("Checkpoint folder was illegally deleted");
         }
     }
 
     public static JSONObject getPreloadCheckpoint() {
         if (!preloadModelEnabled) {
-            throw new IllegalStateException("Cannot preload checkpoint as preload model is not enabled.");
+            throw new IllegalStateException("Cannot preload checkpoint as preload model is not enabled");
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(preloadModelFrom))) {

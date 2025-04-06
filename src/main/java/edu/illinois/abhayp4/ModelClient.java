@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.json.JSONPropertyIgnore;
 import org.json.JSONPropertyName;
 
@@ -26,9 +24,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.IOError;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.ObjectMapper;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 final class ModelClient implements Closeable {
     private final Socket socket;
@@ -36,11 +34,11 @@ final class ModelClient implements Closeable {
     private final BufferedReader serverIn;
     private final PrintWriter serverOut;
 
-    private List<ModelIdInputPair> inputBatch;
-    private Queue<Object> outputBatch;
-    private ObjectMapper objectMapper;
-    private volatile long outputCount = 0;
-    private volatile long outputCurrent = 0;
+    private final List<ModelIdInputPair> inputBatch;
+    private final Queue<Object> outputBatch;
+    private final ObjectMapper objectMapper;
+    private long outputCount = 0;
+    private long outputCurrent = 0;
 
     private final ModelClientInputData startRound;
     private final ModelClientInputData endRound;
@@ -67,7 +65,12 @@ final class ModelClient implements Closeable {
             throw new IOError(e);
         }
 
+        objectMapper = new ObjectMapper();
+
         initializeClient();
+        
+        inputBatch = new ArrayList<>();
+        outputBatch = new ArrayDeque<>();
 
         startRound = new ModelClientInputData("StartRound", -1, null, null);
         endRound = new ModelClientInputData("EndRound", -1, null, null);
@@ -78,9 +81,13 @@ final class ModelClient implements Closeable {
             GlobalState.shouldUseCuda()
         };
 
-        objectMapper = new ObjectMapper();
-        
-        String argumentsJson = objectMapper.writeValueAsString(arguments);
+        String argumentsJson;
+        try {
+            argumentsJson = objectMapper.writeValueAsString(arguments);
+        }
+        catch (JsonProcessingException e) {
+            throw new IllegalStateException("Error processing JSON", e);
+        } 
         
         ModelClientInputData data = new ModelClientInputData(
             "Initialize", -1, argumentsJson, null);
@@ -88,16 +95,12 @@ final class ModelClient implements Closeable {
         boolean valid = sendAndReceive(data, boolean.class);
 
         if (!valid) {
-            throw new IllegalStateException("Invalid client intialization");
+            throw new IllegalStateException("Invalid client initialization");
         }
 
-        Thread thread = new Thread(() -> batch());
+        Thread thread = new Thread(() -> batch(), "ModelClient-BatchThread");
         thread.setDaemon(true);
         thread.start();
-
-        
-        inputBatch = new ArrayList<>();
-        outputBatch = new ArrayDeque<>();
     }
 
     private void batch() {
@@ -114,7 +117,7 @@ final class ModelClient implements Closeable {
 
             synchronized (this) {
                 ModelClientInputData data = new ModelClientInputData(
-                    "GetBatch", -1, null, null);
+                    "GetBatch", -1, null, inputBatch.toArray(new ModelIdInputPair[inputBatch.size()]));
 
                 Object[] output = sendAndReceive(data, Object[].class);
                 outputBatch.addAll(Arrays.asList(output));
@@ -157,9 +160,7 @@ final class ModelClient implements Closeable {
 
     public Object getOutputBatched(int modelId, String input) {
         ModelIdInputPair pair = new ModelIdInputPair(modelId, input);
-        addInput(pair);
-
-        long id = ++outputCount;
+        long id = addInput(pair);
 
         synchronized (this) {
             while (outputCurrent < id) {
@@ -169,11 +170,12 @@ final class ModelClient implements Closeable {
                 catch (InterruptedException e) { }
             }
 
+            outputCurrent++;
             return outputBatch.remove();
         }
     }
 
-    public synchronized void addInput(ModelIdInputPair pair) {
+    public synchronized long addInput(ModelIdInputPair pair) {
         final int MAX_BATCH_SIZE = 16;
         
         while (inputBatch.size() >= MAX_BATCH_SIZE) {
@@ -184,6 +186,8 @@ final class ModelClient implements Closeable {
         }
 
         inputBatch.add(pair);
+
+        return ++outputCount;
     }
 
     public Object[] getOutput(int modelId, String input) {
@@ -204,33 +208,45 @@ final class ModelClient implements Closeable {
     }
 
     private synchronized void send(ModelClientInputData data) {
-        serverOut.println(objectMapper.writeValueAsString(data));
+        try {
+            serverOut.println(objectMapper.writeValueAsString(data));
+        }
+        catch (JsonProcessingException e) {
+            throw new IllegalStateException("Error processing JSON", e);
+        }
         serverOut.flush();
     }
 
     private synchronized <R> R receive(Class<R> clazz) throws IOException {
         String line = serverIn.readLine();
         if (line == null) {
-            throw new IOException("Client closed");
+            throw new IOException("Client closed unexpectedly");
         }
         return objectMapper.readValue(line, clazz);
     }
     
     @Override
     public synchronized void close() {
-        serverOut.println(objectMapper.writeValueAsString(null));
-
         try {
-            socket.close();
+            serverOut.println(objectMapper.writeValueAsString(null));
         }
-        catch (IOException e) { }
+        catch (JsonProcessingException e) {
+            throw new IllegalStateException("Null cannot be converted to JSON", e);
+        }
+        
+        try {
+            serverIn.close();
+        }
+        catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
         finally {
+            serverOut.close();
             try {
-                serverIn.close();
+                socket.close();
             }
-            catch (IOException e2) { }
-            finally {
-                serverOut.close();
+            catch (IOException e2) {
+                System.err.println(e2.getMessage());
             }
         }
 
@@ -251,17 +267,10 @@ final class ModelClient implements Closeable {
 }
 
 class ModelClientInputData {
-    @JsonProperty("Operation")
-    public String operation;
-
-    @JSONProperty("ModelId")
-    public int modelId;
-
-    @JSONProperty("Input")
-    public String input;
-    
-    @JSONProperty("Batch")
-    public ModelIdInputPair[] batch;
+    @JsonProperty("Operation") public String operation;
+    @JsonProperty("ModelId") public int modelId;
+    @JsonProperty("Input") public String input;
+    @JsonProperty("Batch") public ModelIdInputPair[] batch;
 
     public ModelClientInputData(
         String operation, int modelId, String input, ModelIdInputPair[] batch
@@ -274,8 +283,8 @@ class ModelClientInputData {
 }
 
 class ModelIdInputPair {
-    public int modelId;
-    public String input;
+    @JsonProperty("ModelId") public int modelId;
+    @JsonProperty("Input") public String input;
 
     public ModelIdInputPair(int modelId, String input) {
         this.modelId = modelId;

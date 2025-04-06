@@ -5,11 +5,9 @@
 
 package edu.illinois.abhayp4;
 
-import com.fasterxml.jackson.JsonProperty;
-import com.fasterxml.jackson.JsonCreator;
-import com.fasterxml.jackson.JsonGetter;
-import com.fasterxml.jackson.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
 
+@JsonAutoDetect(fieldVisibility = Visibility.ANY)
 final class MetaNeuron extends RelayNeuron {
     @JsonProperty("Children")
     private final RelayNeuron[] children;
