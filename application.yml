@@ -28,7 +28,7 @@ application:
             warning_cutoff: 0.95  # Cutoff for warning about low reliabiliy (0-1, 0 to never warn, 1 to aalways warn)
     
     # Configuration for the behavior of the model
-    model:
+    model_config:
         random_seed: 42  # Random seed for deterministic random parameters
         n_levels: 4  # Number of levels of the model (Each level except the lowest one has subneurons)
         neuron_activity_control:
@@ -84,7 +84,7 @@ application:
             discriminator_transformer: GPT2  # Tranformer model for discriminating between responses (GPT2/BERT/RoBERTA/T5/XLNET/BART)
     
     # Configuration for the training process (if training is allowed)
-    optimization:
+    optimization_config:
         train_frequency: 1  # Frequency of training (# of responses)
         type: Adam  # Type of optimization algorithm (Adam/SGD/RMSProp/Adagrad)
         learning_rate: 0.001  # Learning rate for training
