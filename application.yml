@@ -21,7 +21,7 @@ application:
             enabled: yes  # Enable logging
             to: ./user_data/logs/  # Folder path to save logs
             file_name_prefix: ~ # File name prefix for logs ("~" for default value, none)
-            verbosity: 3  # Verbosity level for logging (1-3)
+            verbosity: high  # Verbosity level for logging (low/medium/high)
         intentional_delay_factor: 1  # Factor to delay entire model to run on low-end devices (1 for no delay, 2 for double delay, etc.)
         concurrent_reliability:
             training_cutoff: 0.9  # Cutoff for allowing training on low reliability (0-1, 0 to always train, 1 to never train unless perfect)
