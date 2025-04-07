@@ -9,6 +9,12 @@ import java.io.Closeable;
 
 import com.fasterxml.jackson.annotation.*;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.MINIMAL_CLASS, include = JsonTypeInfo.As.PROPERTY)
+@JsonSubTypes({
+    //@JsonSubTypes.Type(value = ResponseNeuron.class),
+    @JsonSubTypes.Type(value = MetaNeuron.class),
+    @JsonSubTypes.Type(value = BaseNeuron.class)
+})
 abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
     @JsonIgnore private final Object receiveSignal;
     protected final Source source1, source2;
@@ -19,7 +25,7 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
     private boolean closed = false;
 
     public RelayNeuron(
-        String name, Source src1, Source src2, Target tgt1, Target tgt2
+        String name, ModelClientService service, Source src1, Source src2, Target tgt1, Target tgt2
     ) {
         super(name);
         receiveSignal = new Object();
@@ -30,7 +36,7 @@ abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
         target1.setReceiveSignal(receiveSignal);
         target2.setReceiveSignal(receiveSignal);
 
-        client = ModelClientService.getService().getAvailableClient();
+        client = service.getAvailableClient();
         thread = new Thread(this, this + "-Thread");
         thread.setDaemon(false);
     }

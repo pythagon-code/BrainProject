@@ -15,22 +15,25 @@ import java.util.Random;
 import java.io.Closeable;
 
 final class ModelClientService implements Closeable {
-    static ModelClientService service;
-
     private int maxThreadsPerClient;
     private Map<ModelClient, Integer> clientUsage;
     private List<ModelClient> availableClients;
     private Random random;
 
-    public static ModelClientService getService() {
-        if (service == null) {
-            synchronized (ModelClientService.class) {
-                if (service == null) {
-                    service = new ModelClientService();
-                }
-            }
+    private ModelClientService() {
+        maxThreadsPerClient = Math.ceilDiv(GlobalState.getNNeuronThreads(), getNPythonWorkers());
+        clientUsage = new HashMap<>();
+
+        for (int i = 0; i < getNPythonWorkers(); i++) {
+            clientUsage.put(new ModelClient(), 0);
         }
-        return service;
+
+        availableClients = new ArrayList<>(clientUsage.keySet());
+        random = new Random();
+    }
+
+    private int getNPythonWorkers() {
+        return Math.max(GlobalState.getNPythonWorkers(), GlobalState.getNNeuronThreads());
     }
 
     public synchronized ModelClient getAvailableClient() {
@@ -56,22 +59,5 @@ final class ModelClientService implements Closeable {
         for (ModelClient client : clientUsage.keySet()) {
             client.close();
         }
-    }
-
-    private ModelClientService() {
-        maxThreadsPerClient = Math.ceilDiv(GlobalState.getNNeuronThreads(), getNPythonWorkers());
-        clientUsage = new HashMap<>();
-
-        for (int i = 0; i < getNPythonWorkers(); i++) {
-            clientUsage.put(new ModelClient(), 0);
-        }
-
-        availableClients = new ArrayList<>(clientUsage.keySet());
-        random = new Random();
-    }
-
-
-    private int getNPythonWorkers() {
-        return Math.max(GlobalState.getNPythonWorkers(), GlobalState.getNNeuronThreads());
     }
 }

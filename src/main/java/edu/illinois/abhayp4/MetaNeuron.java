@@ -16,10 +16,11 @@ final class MetaNeuron extends RelayNeuron {
     private final TextChannel outer12Src, outer34Src;
     private final TextChannel outer1Tgt, outer2Tgt, outer3Tgt, outer4Tgt;
 
+    @JsonCreator
     public MetaNeuron(
-        String name, Source src1, Source src2, Target tgt1, Target tgt2, int level
+        String name, ModelClientService service, Source src1, Source src2, Target tgt1, Target tgt2, int level
     ) {
-        super(name, src1, src2, tgt1, tgt2);
+        super(name, service, src1, src2, tgt1, tgt2);
 
         inner14 = new TextChannel(name + "-inner14");
         inner43 = new TextChannel(name + "-inner43");
@@ -36,15 +37,15 @@ final class MetaNeuron extends RelayNeuron {
 
         children = new RelayNeuron[4];
         if (level == 1) {
-            children[0] = new BaseNeuron(name + "-1", outer12Src, inner14, outer1Tgt, inner21);
-            children[1] = new BaseNeuron(name + "-2", outer12Src, inner21, outer2Tgt, inner32);
-            children[2] = new BaseNeuron(name + "-3", outer34Src, inner32, outer3Tgt, inner43);
-            children[3] = new BaseNeuron(name + "-4", outer34Src, inner43, outer4Tgt, inner14);
+            children[0] = new BaseNeuron(name + "-1", service, outer12Src, inner14, outer1Tgt, inner21);
+            children[1] = new BaseNeuron(name + "-2", service, outer12Src, inner21, outer2Tgt, inner32);
+            children[2] = new BaseNeuron(name + "-3", service, outer34Src, inner32, outer3Tgt, inner43);
+            children[3] = new BaseNeuron(name + "-4", service, outer34Src, inner43, outer4Tgt, inner14);
         } else {
-            children[0] = new MetaNeuron(name + "-1", outer12Src, inner14, outer1Tgt, inner21, level - 1);
-            children[1] = new MetaNeuron(name + "-2", outer12Src, inner21, outer2Tgt, inner32, level - 1);
-            children[2] = new MetaNeuron(name + "-3", outer34Src, inner32, outer3Tgt, inner43, level - 1);
-            children[3] = new MetaNeuron(name + "-4", outer34Src, inner43, outer4Tgt, inner14, level - 1);
+            children[0] = new MetaNeuron(name + "-1", service, outer12Src, inner14, outer1Tgt, inner21, level - 1);
+            children[1] = new MetaNeuron(name + "-2", service,  outer12Src, inner21, outer2Tgt, inner32, level - 1);
+            children[2] = new MetaNeuron(name + "-3", service, outer34Src, inner32, outer3Tgt, inner43, level - 1);
+            children[3] = new MetaNeuron(name + "-4", service, outer34Src, inner43, outer4Tgt, inner14, level - 1);
         }
     }
 

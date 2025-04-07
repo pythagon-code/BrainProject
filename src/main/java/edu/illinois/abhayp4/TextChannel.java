@@ -9,6 +9,9 @@ import java.util.ArrayDeque;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
+
+@JsonIgnoreType
 final class TextChannel extends NamedObject implements Source, Target {
     private final Queue<String> messages;
     private Object receiveSignal;

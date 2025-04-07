@@ -9,6 +9,7 @@ import edu.illinois.abhayp4.Application;
 
 public class Main {
     public static void main(String[] args) {
-        Application.start();
+        Application app = new Application("application.yml");
+        app.start(false);
     }
 }
