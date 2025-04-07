@@ -105,7 +105,7 @@ public class Application {
             logTo = getNestedField("main_config", "log", "to");
             logFileNamePrefix = getNestedFieldOrDefault("", "main_config", "log", "file_name_prefix");
             String logVerbosityStr = getNestedField("main_config", "log", "verbosity");
-            logVerbosity = LogVerbosity.valueOf(logVerbosityStr);
+            logVerbosity = LogVerbosity.valueOf(logVerbosityStr.toUpperCase());
         }
     }
 
