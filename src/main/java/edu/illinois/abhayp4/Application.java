@@ -1,32 +1,50 @@
 package edu.illinois.abhayp4;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.IOError;
+import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.yaml.snakeyaml.Yaml;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 public class Application {
     private final Map<String, Object> config;
     private final MainConfiguration mainConfig;
     private final ModelConfiguration modelConfig;
     private final OptimizationConfiguration optimizationConfig;
+    private final ObjectWriter writer;
 
     @SuppressWarnings("unchecked")
     public Application(String yamlFile) {
         try (InputStream stream = new FileInputStream(yamlFile)) {
             Yaml yaml = new Yaml();
+
             Map<String, Object> object = yaml.load(stream);
             config = (Map<String, Object>) object.get("application");
-            mainConfig = null;
+
+            mainConfig = MainConfiguration.loadFromApplicationConfig(this);
             modelConfig = null;
             optimizationConfig = null;
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
+            DefaultIndenter indenter = new DefaultIndenter("\t", DefaultIndenter.SYS_LF);
+            prettyPrinter.indentObjectsWith(indenter);
+            prettyPrinter.indentArraysWith(indenter);
+
+            writer = objectMapper.writer(prettyPrinter);
+
+            System.out.println(writer.writeValueAsString(mainConfig));
 
             System.out.println("hello");
         }
@@ -63,7 +81,7 @@ public class Application {
     }
 
     class MainConfiguration {
-        @JsonProperty("PythonExecutable") public final int pythonExecutable;
+        @JsonProperty("PythonExecutable") public final String pythonExecutable;
         @JsonProperty("NPythonWorkers") public final int nPythonWorkers;
         @JsonProperty("UseCuda") public final boolean useCuda;
         @JsonProperty("CudaDevice") public final int cudaDevice;
@@ -87,25 +105,65 @@ public class Application {
             HIGH
         };
 
-        public MainConfiguration() {
-            pythonExecutable = getNestedField("main_config", "python_executable");
-            nPythonWorkers = getNestedField("main_config", "n_python_workers");
-            useCuda = getNestedField("main_config", "use_cuda");
-            cudaDevice = getNestedField("main_config", "cuda_device");
-            trainingAllowed = getNestedField("main_config", "training_allowed");
-            preloadModelEnabled = getNestedField("main_config", "preload_model", "enabled");
-            preloadModelFrom = getNestedField("main_config", "preload_model", "from");
-            errorOnInconsistentModel = getNestedField("main_config", "preload_model", "error_on_inconsistent_model");
-            errorOnDifferentOptimization = getNestedField("main_config", "preload_model", "error_on_different_optimization");
-            saveCheckpointsEnabled = getNestedField("main_config", "save_checkpoints", "enabled");
-            saveCheckpointsTo = getNestedField("main_config", "save_checkpoints", "to");
-            saveCheckpointsFileNamePrefix = getNestedFieldOrDefault("", "main_config", "save_checkpoints", "file_name_prefix");
-            saveCheckpointsFrequency = getNestedField("main_config", "save_checkpoints", "frequency");
-            logEnabled = getNestedField("main_config", "log", "enabled");
-            logTo = getNestedField("main_config", "log", "to");
-            logFileNamePrefix = getNestedFieldOrDefault("", "main_config", "log", "file_name_prefix");
-            String logVerbosityStr = getNestedField("main_config", "log", "verbosity");
-            logVerbosity = LogVerbosity.valueOf(logVerbosityStr.toUpperCase());
+        @JsonCreator
+        public MainConfiguration(
+            @JsonProperty("PythonExecutable") String pythonExecutable,
+            @JsonProperty("NPythonWorkers") int nPythonWorkers,
+            @JsonProperty("UseCuda") boolean useCuda,
+            @JsonProperty("CudaDevice") int cudaDevice,
+            @JsonProperty("TrainingAllowed") boolean trainingAllowed,
+            @JsonProperty("PreloadModelEnabled") boolean preloadModelEnabled,
+            @JsonProperty("PreloadModelFrom") String preloadModelFrom,
+            @JsonProperty("ErrorOnInconsistentModel") boolean errorOnInconsistentModel,
+            @JsonProperty("ErrorOnDifferentOptimization") boolean errorOnDifferentOptimization,
+            @JsonProperty("SaveCheckpointsEnabled") boolean saveCheckpointsEnabled,
+            @JsonProperty("SaveCheckpointsTo") String saveCheckpointsTo,
+            @JsonProperty("SaveCheckpointsFileNamePrefix") String saveCheckpointsFileNamePrefix,
+            @JsonProperty("SaveCheckpointsFrequency") int saveCheckpointsFrequency,
+            @JsonProperty("LogEnabled") boolean logEnabled,
+            @JsonProperty("LogTo") String logTo,
+            @JsonProperty("LogFileNamePrefix") String logFileNamePrefix,
+            @JsonProperty("LogVerbosity") LogVerbosity logVerbosity
+        ) {
+            this.pythonExecutable = pythonExecutable;
+            this.nPythonWorkers = nPythonWorkers;
+            this.useCuda = useCuda;
+            this.cudaDevice = cudaDevice;
+            this.trainingAllowed = trainingAllowed;
+            this.preloadModelEnabled = preloadModelEnabled;
+            this.preloadModelFrom = preloadModelFrom;
+            this.errorOnInconsistentModel = errorOnInconsistentModel;
+            this.errorOnDifferentOptimization = errorOnDifferentOptimization;
+            this.saveCheckpointsEnabled = saveCheckpointsEnabled;
+            this.saveCheckpointsTo = saveCheckpointsTo;
+            this.saveCheckpointsFileNamePrefix = saveCheckpointsFileNamePrefix;
+            this.saveCheckpointsFrequency = saveCheckpointsFrequency;
+            this.logEnabled = logEnabled;
+            this.logTo = logTo;
+            this.logFileNamePrefix = logFileNamePrefix;
+            this.logVerbosity = logVerbosity;
+        }
+
+        public static MainConfiguration loadFromApplicationConfig(Application app) {
+            return app.new MainConfiguration(
+                app.getNestedField("main_config", "python_executable"),
+                app.getNestedField("main_config", "n_python_workers"),
+                app.getNestedField("main_config", "use_cuda"),
+                app.getNestedField("main_config", "cuda_device"),
+                app.getNestedField("main_config", "training_allowed"),
+                app.getNestedField("main_config", "preload_model", "enabled"),
+                app.getNestedField("main_config", "preload_model", "from"),
+                app.getNestedField("main_config", "preload_model", "error_on_inconsistent_model"),
+                app.getNestedField("main_config", "preload_model", "error_on_different_optimization"),
+                app.getNestedField("main_config", "save_checkpoints", "enabled"),
+                app.getNestedField("main_config", "save_checkpoints", "to"),
+                app.getNestedFieldOrDefault("", "main_config", "save_checkpoints", "file_name_prefix"),
+                app.getNestedField("main_config", "save_checkpoints", "frequency"),
+                app.getNestedField("main_config", "log", "enabled"),
+                app.getNestedField("main_config", "log", "to"),
+                app.getNestedFieldOrDefault("", "main_config", "log", "file_name_prefix"),
+                LogVerbosity.valueOf(((String) app.getNestedField("main_config", "log", "verbosity")).toUpperCase())
+            );
         }
     }
 

@@ -5,14 +5,14 @@
 
 package edu.illinois.abhayp4;
 
+import java.io.Closeable;
+
 import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Random;
-
-import java.io.Closeable;
 
 final class ModelClientService implements Closeable {
     private int maxThreadsPerClient;

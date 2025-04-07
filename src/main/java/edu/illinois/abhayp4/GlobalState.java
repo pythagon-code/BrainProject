@@ -5,14 +5,14 @@
 
 package edu.illinois.abhayp4;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
 import java.nio.file.Paths;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.FileNotFoundException;
-
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 
 final class GlobalState {
     public class ModelParameters {
