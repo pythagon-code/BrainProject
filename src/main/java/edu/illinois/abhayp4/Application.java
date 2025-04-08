@@ -130,10 +130,9 @@ public class Application {
         }
 
         String fileName = mainConfig.saveCheckpointsFileNamePrefix + getTimestamp() + ".json";
+        String checkpointsFilePath = Paths.get(checkpointsFolderPath, fileName).toString();
 
-        String checkpointsFile = Paths.get(checkpointsFolderPath, fileName).toString();
-
-        try (PrintWriter pw = new PrintWriter(checkpointsFile)) {
+        try (PrintWriter pw = new PrintWriter(checkpointsFilePath)) {
             Checkpoint checkpoint = new Checkpoint(mainConfig, optimizationConfig, responseNeuron);
             pw.println(writer.writeValueAsString(checkpoint));
         }
