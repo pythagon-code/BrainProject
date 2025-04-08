@@ -1,5 +1,5 @@
 /**
- * NamedObject.java
+ * RootObject.java
  * @author Abhay Pokhriyal
  */
 
