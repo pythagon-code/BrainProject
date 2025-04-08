@@ -1,19 +1,20 @@
 package edu.illinois.abhayp4;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.io.PrintWriter;
 import java.nio.file.Paths;
-
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,84 +31,136 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 public class Application {
     private final Map<String, Object> config;
-    private final MainConfiguration mainConfig;
-    private final ModelConfiguration modelConfig;
-    private final OptimizationConfiguration optimizationConfig;
+    public final MainConfiguration mainConfig;
+    public final ModelConfiguration modelConfig;
+    public final OptimizationConfiguration optimizationConfig;
 
     private final ObjectWriter writer;
 
-    private final Logger logger;
+    public final Logger logger;
+
+    private final String checkpointsFolderPath;
 
     public static final Level LOW = new Level("LOW", Level.INFO.intValue() + 1) {};
     public static final Level MEDIUM = new Level("MEDIUM", LOW.intValue() + 1) {};
     public static final Level HIGH = new Level("HIGH", MEDIUM.intValue() + 1) {};
 
     @SuppressWarnings("unchecked")
-    public Application(String yamlFile) {
-        try (InputStream stream = new FileInputStream(yamlFile)) {
-            Yaml yaml = new Yaml();
+    public Application(InputStream yamlStream) {
+        Yaml yaml = new Yaml();
 
-            Map<String, Object> object = yaml.load(stream);
-            config = (Map<String, Object>) object.get("application");
+        Map<String, Object> object = yaml.load(yamlStream);
+        config = (Map<String, Object>) object.get("application");
 
-            mainConfig = MainConfiguration.loadFromApplicationConfig(this);
-            modelConfig = null;
-            optimizationConfig = null;
+        mainConfig = MainConfiguration.loadFromApplicationConfig(this);
+        modelConfig = null;
+        optimizationConfig = null;
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
-            DefaultIndenter indenter = new DefaultIndenter("\t", DefaultIndenter.SYS_LF);
-            prettyPrinter.indentObjectsWith(indenter);
-            prettyPrinter.indentArraysWith(indenter);
+        ObjectMapper objectMapper = new ObjectMapper();
+        DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
+        DefaultIndenter indenter = new DefaultIndenter("\t", DefaultIndenter.SYS_LF);
+        prettyPrinter.indentObjectsWith(indenter);
+        prettyPrinter.indentArraysWith(indenter);
 
-            writer = objectMapper.writer(prettyPrinter);
-            
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_z");
-            String fileName = mainConfig.logFileNamePrefix + ZonedDateTime.now().format(formatter) + ".log";
-            String filePath = Paths.get(mainConfig.logTo, fileName).toString();
-            try {
-                FileHandler fileHandler = new FileHandler(filePath.replace("%", "%%"), false);
-                fileHandler.setFormatter(new SimpleFormatter());
+        writer = objectMapper.writer(prettyPrinter);
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_z");
+        String fileName = mainConfig.logFileNamePrefix + ZonedDateTime.now().format(formatter) + ".log";
+        String filePath = Paths.get(mainConfig.logTo, fileName).toString();
+        try {
+            FileHandler fh = new FileHandler(filePath.replace("%", "%%"), false);
+            fh.setFormatter(new SimpleFormatter());
 
-                logger = Logger.getLogger("Application");
-                logger.addHandler(fileHandler);
-            }
-            catch (IOException e) {
-                throw new IOError(e);
-            }
-
-            switch (mainConfig.logVerbosity) {
-            case MainConfiguration.LogVerbosity.LOW:
-                logger.setLevel(LOW);
-                break;
-            case MainConfiguration.LogVerbosity.MEDIUM:
-                logger.setLevel(MEDIUM);
-                break;
-            default:
-                logger.setLevel(HIGH);
-            }
-
-            logger.setUseParentHandlers(true);
-
-            logger.log(LOW, "hello");
-
-            System.out.println(writer.writeValueAsString(mainConfig));
-            System.out.println("hello");
+            logger = Logger.getLogger("Application");
+            logger.addHandler(fh);
         }
         catch (IOException e) {
             throw new IOError(e);
         }
+
+        switch (mainConfig.logVerbosity) {
+        case MainConfiguration.LogVerbosity.LOW:
+            logger.setLevel(LOW);
+            break;
+        case MainConfiguration.LogVerbosity.MEDIUM:
+            logger.setLevel(MEDIUM);
+            break;
+        case MainConfiguration.LogVerbosity.HIGH:
+            logger.setLevel(HIGH);
+        }
+
+        logger.addHandler(new ConsoleHandler());
+        logger.setUseParentHandlers(true);
+
+        logger.log(LOW, "hello");
+
+        if (mainConfig.saveCheckpointsEnabled) {
+            File checkpointsFolder = new File(mainConfig.saveCheckpointsTo);
+            checkpointsFolder.mkdirs();
+            try {
+                checkpointsFolderPath = checkpointsFolder.getCanonicalPath();
+            }
+            catch (IOException e) {
+                throw new IOError(e);
+            }
+        }
+        else {
+            checkpointsFolderPath = null;
+        }
+
+        saveCheckpoint(new ResponseNeuron("hi"));
+
+        try {
+            System.out.println(writer.writeValueAsString(mainConfig));
+        }
+        catch (IOException e) {
+            throw new IOError(e);
+        }
+        System.out.println("hello");
     }
 
     public void start(boolean test) {
 
     }
 
-    private void saveCheckpoint() {
-        
+    private void saveCheckpoint(ResponseNeuron responseNeuron) {
+        if (!mainConfig.saveCheckpointsEnabled) {
+            return;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_z");
+        String fileName = mainConfig.saveCheckpointsFileNamePrefix + ZonedDateTime.now().format(formatter) + ".json";
+
+        String checkpointsFile = Paths.get(checkpointsFolderPath, fileName).toString();
+
+        try (PrintWriter pw = new PrintWriter(checkpointsFile)) {
+            Checkpoint checkpoint = new Checkpoint(mainConfig, optimizationConfig, responseNeuron);
+            pw.println(writer.writeValueAsString(checkpoint));
+        }
+        catch (IOException e) {
+            System.err.println("Error saving checkpoint");
+            throw new IOError(e);
+        }
     }
 
-    class MainConfiguration extends RootObject {
+    private class Checkpoint {
+        @JsonProperty("ModelConfig") public final MainConfiguration modelConfig;
+        @JsonProperty("OptimizationConfig") public final OptimizationConfiguration optimizationConfig;
+        @JsonProperty("ResponseNeuron") public final ResponseNeuron responseNeuron;
+
+        @JsonCreator
+        public Checkpoint(
+            @JsonProperty("ModelConfig") MainConfiguration modelConfig,
+            @JsonProperty("OptimizationConfig") OptimizationConfiguration optimizationConfig,
+            @JsonProperty("ResponseNeuron") ResponseNeuron responseNeuron
+        ) {
+            this.modelConfig = modelConfig;
+            this.optimizationConfig = optimizationConfig;
+            this.responseNeuron = responseNeuron;
+        }
+    }
+
+    public class MainConfiguration extends RootObject {
         @JsonProperty("PythonExecutable") public final String pythonExecutable;
         @JsonProperty("NPythonWorkers") public final int nPythonWorkers;
         @JsonProperty("UseCuda") public final boolean useCuda;
@@ -164,7 +217,7 @@ public class Application {
             this.saveCheckpointsEnabled = saveCheckpointsEnabled;
             this.saveCheckpointsTo = saveCheckpointsTo;
             this.saveCheckpointsFileNamePrefix = saveCheckpointsFileNamePrefix;
-            this.saveCheckpointsFrequency = saveCheckpointsEnabled ? saveCheckpointsFrequency : Long.MAX_VALUE;
+            this.saveCheckpointsFrequency = saveCheckpointsFrequency;
             this.logTo = logTo;
             this.logFileNamePrefix = logFileNamePrefix;
             this.logVerbosity = logVerbosity;
@@ -193,12 +246,18 @@ public class Application {
         }
     }
 
-    class ModelConfiguration {
-
+    public class ModelConfiguration extends RootObject {
+        @JsonCreator
+        public ModelConfiguration(@JsonProperty("Name") String name) {
+            super(name);
+        }
     }
 
-    class OptimizationConfiguration {
-        
+    public class OptimizationConfiguration extends RootObject {
+        @JsonCreator
+        public OptimizationConfiguration(@JsonProperty("Name") String name) {
+            super(name);
+        }
     }
 
     @SuppressWarnings("unchecked")
