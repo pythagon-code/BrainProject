@@ -5,8 +5,6 @@
 
 package edu.illinois.abhayp4;
 
-import com.fasterxml.jackson.annotation.*;
-
 final class BaseNeuron extends RelayNeuron {
     public BaseNeuron(
         String name, ModelClientService service, Source src1, Source src2, Target tgt1, Target tgt2

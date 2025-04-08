@@ -1,13 +1,11 @@
 package edu.illinois.abhayp4;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -64,14 +62,22 @@ public class Application {
 
         writer = objectMapper.writer(prettyPrinter);
         
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_z");
-        String fileName = mainConfig.logFileNamePrefix + ZonedDateTime.now().format(formatter) + ".log";
-        String filePath = Paths.get(mainConfig.logTo, fileName).toString();
+        String timestamp = getTimestamp();
+        
+        String logFolderPath = Paths.get(
+            mainConfig.logTo.replace("%", "%%"), timestamp).toString();
+        new File(logFolderPath).mkdirs();
+
+        String logFileName = mainConfig.logFileNamePrefix.replace("%", "%%") + "%g.log";
+        String logFilePath = Paths.get(logFolderPath, logFileName).toString();
+
         try {
-            FileHandler fh = new FileHandler(filePath.replace("%", "%%"), false);
+            final int BYTES_PER_MB = 1024 * 1024;
+            FileHandler fh = new FileHandler(
+                logFilePath, BYTES_PER_MB * mainConfig.maxSizePerLog, mainConfig.nRotatingLogs, true);
             fh.setFormatter(new SimpleFormatter());
 
-            logger = Logger.getLogger("Application");
+            logger = Logger.getLogger("application");
             logger.addHandler(fh);
         }
         catch (IOException e) {
@@ -95,14 +101,9 @@ public class Application {
         logger.log(LOW, "hello");
 
         if (mainConfig.saveCheckpointsEnabled) {
-            File checkpointsFolder = new File(mainConfig.saveCheckpointsTo);
+            checkpointsFolderPath = Paths.get(mainConfig.saveCheckpointsTo, timestamp).toString();
+            File checkpointsFolder = new File(checkpointsFolderPath);
             checkpointsFolder.mkdirs();
-            try {
-                checkpointsFolderPath = checkpointsFolder.getCanonicalPath();
-            }
-            catch (IOException e) {
-                throw new IOError(e);
-            }
         }
         else {
             checkpointsFolderPath = null;
@@ -128,8 +129,7 @@ public class Application {
             return;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_z");
-        String fileName = mainConfig.saveCheckpointsFileNamePrefix + ZonedDateTime.now().format(formatter) + ".json";
+        String fileName = mainConfig.saveCheckpointsFileNamePrefix + getTimestamp() + ".json";
 
         String checkpointsFile = Paths.get(checkpointsFolderPath, fileName).toString();
 
@@ -141,6 +141,11 @@ public class Application {
             System.err.println("Error saving checkpoint");
             throw new IOError(e);
         }
+    }
+
+    private String getTimestamp() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_z");
+        return ZonedDateTime.now().format(formatter);
     }
 
     private class Checkpoint {
@@ -176,6 +181,8 @@ public class Application {
         @JsonProperty("SaveCheckpointsFrequency") public final long saveCheckpointsFrequency;
         @JsonProperty("LogTo") public final String logTo;
         @JsonProperty("LogFileNamePrefix") public final String logFileNamePrefix;
+        @JsonProperty("NRotatingLogs") public final int nRotatingLogs;
+        @JsonProperty("MaxSizePerLog") public final int maxSizePerLog;
         @JsonProperty("LogVerbosity") public final LogVerbosity logVerbosity;
 
         public static enum LogVerbosity {
@@ -202,6 +209,8 @@ public class Application {
             @JsonProperty("SaveCheckpointsFrequency") int saveCheckpointsFrequency,
             @JsonProperty("LogTo") String logTo,
             @JsonProperty("LogFileNamePrefix") String logFileNamePrefix,
+            @JsonProperty("NRotatingLogs") int nRotatingLogs,
+            @JsonProperty("MaxSizePerLog") int maxSizePerLog,
             @JsonProperty("LogVerbosity") LogVerbosity logVerbosity
         ) {
             super(name);
@@ -220,6 +229,8 @@ public class Application {
             this.saveCheckpointsFrequency = saveCheckpointsFrequency;
             this.logTo = logTo;
             this.logFileNamePrefix = logFileNamePrefix;
+            this.nRotatingLogs = nRotatingLogs;
+            this.maxSizePerLog = maxSizePerLog;
             this.logVerbosity = logVerbosity;
         }
 
@@ -241,6 +252,8 @@ public class Application {
                 app.getNestedField("main_config", "save_checkpoints", "frequency"),
                 app.getNestedField("main_config", "log", "to"),
                 app.getNestedFieldOrDefault("", "main_config", "log", "file_name_prefix"),
+                app.getNestedField("main_config", "log", "n_rotating_logs"),
+                app.getNestedField("main_config", "log", "max_size_per_log"),
                 LogVerbosity.valueOf(((String) app.getNestedField("main_config", "log", "verbosity")).toUpperCase())
             );
         }
