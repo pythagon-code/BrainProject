@@ -2,6 +2,7 @@
 application:
     # Main configuration for the application
     main_config:
+        name: MyMainConfig1  # Name of main configuration
         python_executable: python3  # Python executable name 
         n_python_workers: 32  # Number of Python processes to invoke
         use_cuda: yes  # Use CUDA for GPU acceleration if CUDA is available
