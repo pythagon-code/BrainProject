@@ -20,7 +20,9 @@ application:
             frequency: 120  # Delay between checkpoints (seconds)
         log:
             to: ./user_data/logs/  # Folder path to save logs
-            file_name_prefix: ~ # File name prefix for logs ("~" for default value, none)
+            file_name_prefix: ~  # File name prefix for logs ("~" for default value, none)
+            n_rotating_logs: 10  # Number of rotating log files
+            max_size_per_log: 10  # Maximum size per log files (MB)
             verbosity: low  # Verbosity level for logging (low/medium/high)
         intentional_delay_factor: 1  # Factor to delay entire model to run on low-end devices (1 for no delay, 2 for double delay, etc.)
         concurrent_reliability:
