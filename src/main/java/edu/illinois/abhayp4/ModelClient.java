@@ -266,7 +266,7 @@ final class ModelClient implements Closeable {
         try {
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                System.err.println("Python process exited with error code: " + exitCode + ".");
+                System.err.println("Python process exited with error code: " + exitCode);
             }
         }
         catch (InterruptedException e) {
