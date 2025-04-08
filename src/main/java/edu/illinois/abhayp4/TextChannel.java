@@ -22,12 +22,12 @@ final class TextChannel extends RootObject implements Source, Target {
     }
 
     @Override
-    public void setReceiveSignal(Object receiveSignal) {
-        if (this.receiveSignal != null) {
+    public void setReceiveSignal(Object monitor) {
+        if (receiveSignal != null) {
             throw new IllegalStateException("Monitor already exists");
         }
 
-        this.receiveSignal = receiveSignal;
+        receiveSignal = monitor;
     }
 
     @Override
