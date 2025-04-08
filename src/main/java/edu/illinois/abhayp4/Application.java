@@ -217,7 +217,7 @@ public class Application {
         Object current = config;
         for (String field : path) {
             if (current == null || !(current instanceof Map)) {
-                throw new NoSuchElementException("Field " + Arrays.toString(path) + " does not exist in application.yml");
+                throw new NoSuchElementException("Missing field in path " + Arrays.toString(path) + " in application.yml");
             }
             current = ((Map<String, Object>) current).get(field); 
         }
