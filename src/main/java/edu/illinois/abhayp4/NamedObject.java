@@ -5,8 +5,10 @@
 
 package edu.illinois.abhayp4;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 abstract class NamedObject {
-    public String name;
+    @JsonProperty("Name") public final String name;
 
     public NamedObject(String name) {
         this.name = name;
@@ -14,6 +16,6 @@ abstract class NamedObject {
 
     @Override
     public String toString() {
-        return getClass().getName() + " " + name;
+        return getClass().getSimpleName() + " " + name;
     }
 }
