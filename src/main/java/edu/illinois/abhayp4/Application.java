@@ -107,7 +107,7 @@ public class Application {
         
     }
 
-    class MainConfiguration extends NamedObject {
+    class MainConfiguration extends RootObject {
         @JsonProperty("PythonExecutable") public final String pythonExecutable;
         @JsonProperty("NPythonWorkers") public final int nPythonWorkers;
         @JsonProperty("UseCuda") public final boolean useCuda;

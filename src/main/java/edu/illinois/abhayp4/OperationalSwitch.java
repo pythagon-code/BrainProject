@@ -5,7 +5,7 @@
 
 package edu.illinois.abhayp4;
 
-final class OperationalSwitch extends NamedObject {
+final class OperationalSwitch extends RootObject {
     
     ModelClient client;
 

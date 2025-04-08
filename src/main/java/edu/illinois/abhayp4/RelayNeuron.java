@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.*;
     @JsonSubTypes.Type(value = MetaNeuron.class),
     @JsonSubTypes.Type(value = BaseNeuron.class)
 })
-abstract class RelayNeuron extends NamedObject implements Runnable, Closeable {
+abstract class RelayNeuron extends RootObject implements Runnable, Closeable {
     @JsonIgnore private final Object receiveSignal;
     protected final Source source1, source2;
     private final Target target1, target2;
