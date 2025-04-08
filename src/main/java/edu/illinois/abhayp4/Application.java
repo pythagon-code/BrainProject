@@ -107,7 +107,7 @@ public class Application {
         
     }
 
-    class MainConfiguration {
+    class MainConfiguration extends NamedObject {
         @JsonProperty("PythonExecutable") public final String pythonExecutable;
         @JsonProperty("NPythonWorkers") public final int nPythonWorkers;
         @JsonProperty("UseCuda") public final boolean useCuda;
@@ -132,7 +132,8 @@ public class Application {
         };
 
         @JsonCreator
-        public MainConfiguration(
+        public MainConfiguration (
+            @JsonProperty("Name") String name,
             @JsonProperty("PythonExecutable") String pythonExecutable,
             @JsonProperty("NPythonWorkers") int nPythonWorkers,
             @JsonProperty("UseCuda") boolean useCuda,
@@ -150,6 +151,7 @@ public class Application {
             @JsonProperty("LogFileNamePrefix") String logFileNamePrefix,
             @JsonProperty("LogVerbosity") LogVerbosity logVerbosity
         ) {
+            super(name);
             this.pythonExecutable = pythonExecutable;
             this.nPythonWorkers = nPythonWorkers;
             this.useCuda = useCuda;
@@ -170,6 +172,7 @@ public class Application {
 
         public static MainConfiguration loadFromApplicationConfig(Application app) {
             return app.new MainConfiguration(
+                app.getNestedField("main_config", "name"),
                 app.getNestedField("main_config", "python_executable"),
                 app.getNestedField("main_config", "n_python_workers"),
                 app.getNestedField("main_config", "use_cuda"),
