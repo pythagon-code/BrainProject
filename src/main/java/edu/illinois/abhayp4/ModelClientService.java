@@ -20,7 +20,7 @@ final class ModelClientService implements Closeable {
     private List<ModelClient> availableClients;
     private Random random;
 
-    private ModelClientService() {
+    public ModelClientService() {
         maxThreadsPerClient = Math.ceilDiv(GlobalState.getNNeuronThreads(), getNPythonWorkers());
         clientUsage = new HashMap<>();
 

@@ -32,6 +32,8 @@ public class Application {
     public final MainConfiguration mainConfig;
     public final ModelConfiguration modelConfig;
     public final OptimizationConfiguration optimizationConfig;
+    
+    public final ModelClientService modelClientService = null;
 
     private final ObjectWriter writer;
 
