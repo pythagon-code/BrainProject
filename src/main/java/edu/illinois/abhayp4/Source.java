@@ -9,5 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 @JsonIgnoreType
 interface Source {
-    void enqueue(String message);
+    void setReceiveSignal(Object monitor);
+    boolean hasMessage();
+    String dequeue();
 }

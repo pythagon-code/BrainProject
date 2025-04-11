@@ -17,15 +17,15 @@ import com.fasterxml.jackson.annotation.*;
 })
 abstract class RelayNeuron extends RootObject implements Runnable, Closeable {
     @JsonIgnore private final Object receiveSignal;
-    protected final Source source1, source2;
-    private final Target target1, target2;
+    protected final Target source1, source2;
+    private final Source target1, target2;
 
     protected final ModelClient client;
     private final Thread thread;
     private boolean closed = false;
 
     public RelayNeuron(
-        String name, ModelClientService service, Source src1, Source src2, Target tgt1, Target tgt2
+        String name, ModelClientService service, Target src1, Target src2, Source tgt1, Source tgt2
     ) {
         super(name);
         receiveSignal = new Object();
