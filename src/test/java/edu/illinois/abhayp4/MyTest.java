@@ -14,13 +14,13 @@ import com.fasterxml.jackson.databind.*;
 
 public class MyTest {
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-    private static class MyClass {
+    private static class MyClass1 {
         private final int i, j, k;
         public final int l;
         public TextChannel channel;
 
         @JsonCreator
-        public MyClass(
+        public MyClass1(
             @JsonProperty("i") int i,
             @JsonProperty("j") int j,
             @JsonProperty("k") int k
@@ -34,11 +34,11 @@ public class MyTest {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof MyClass)) {
+            if (!(other instanceof MyClass1)) {
                 return false;
             }
 
-            MyClass obj = (MyClass) other;
+            MyClass1 obj = (MyClass1) other;
             return (i == obj.i) && (j == obj.j) && (k == obj.k) && (channel == obj.channel);
         }
     }
@@ -46,10 +46,10 @@ public class MyTest {
     @Test
     public void testJackson1() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        MyClass obj = new MyClass(1, 2, 3);
+        MyClass1 obj = new MyClass1(1, 2, 3);
         obj.channel = new TextChannel("hello");
         String json = objectMapper.writeValueAsString(obj);
-        MyClass obj2 = objectMapper.readValue(json, MyClass.class);
+        MyClass1 obj2 = objectMapper.readValue(json, MyClass1.class);
         assertNotEquals(obj, obj2);
         obj.channel = null;
         assertEquals(obj, obj2);
@@ -57,6 +57,83 @@ public class MyTest {
 
         System.out.println("testJackson1(): ");
         System.out.println(json);
+        System.out.println();
+    }
+
+    private static class MyClass2 {
+        public final int i;
+
+        @JsonCreator
+        public MyClass2(
+            @JsonProperty("i") int i
+        ) {
+            throw new RuntimeException("Should not be called.");
+        }
+
+        protected MyClass2(int i, int __) {
+            this.i = i;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof MyClass2)) {
+                return false;
+            }
+
+            MyClass2 obj = (MyClass2) other;
+            return (i == obj.i);
+        }
+    }
+
+    private static class MyClass2Child extends MyClass2 {
+
+        @JsonCreator
+        public MyClass2Child(
+            @JsonProperty("i") int i
+        ) {
+            super(i, 0);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof MyClass2)) {
+                return false;
+            }
+
+            MyClass2 obj = (MyClass2) other;
+            return (i == obj.i);
+        }
+    }
+    
+    @Test
+    public void testJacksonSubclass1() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        MyClass2Child obj = new MyClass2Child(10);
+        String json = objectMapper.writeValueAsString(obj);
+        MyClass2Child obj2 = objectMapper.readValue(json, MyClass2Child.class);
+        assertEquals(obj, obj2);
+
+        System.out.println("testJacksonSubclass1(): ");
+        System.out.println(json);
+        System.out.println();
+    }
+
+    public record RecordClass1(
+        @JsonProperty("I") int i,
+        @JsonProperty("String") String str
+    ) { }
+
+    @Test
+    public void testJacksonRecordClass1() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        RecordClass1 obj = new RecordClass1(10, "hello");
+        String json = objectMapper.writeValueAsString(obj);
+        RecordClass1 obj2 = objectMapper.readValue(json, RecordClass1.class);
+        assertEquals(obj, obj2);
+
+        System.out.println("testJacksonRecordClass1(): ");
+        System.out.println(json);
+        System.out.println(obj);
         System.out.println();
     }
 }

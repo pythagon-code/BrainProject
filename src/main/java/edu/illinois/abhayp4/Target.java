@@ -8,6 +8,6 @@ package edu.illinois.abhayp4;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 @JsonIgnoreType
-interface Target {
+sealed interface Target permits TextChannel {
     void enqueue(String message);
 }

@@ -12,12 +12,11 @@ import java.util.Queue;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 @JsonIgnoreType
-final class TextChannel extends RootObject implements Target, Source {
+final class TextChannel {
     private final Queue<String> messages;
     private Object receiveSignal;
     
     TextChannel(String name) {
-        super(name);
         messages = new ArrayDeque<>();
     }
 

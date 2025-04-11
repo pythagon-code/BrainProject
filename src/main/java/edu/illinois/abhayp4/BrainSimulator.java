@@ -27,7 +27,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-public class Application {
+public final class BrainSimulator {
     private final Map<String, Object> config;
     public final MainConfiguration mainConfig;
     public final ModelConfiguration modelConfig;
@@ -46,7 +46,7 @@ public class Application {
     public static final Level HIGH = new Level("HIGH", MEDIUM.intValue() + 1) {};
 
     @SuppressWarnings("unchecked")
-    public Application(InputStream yamlStream) {
+    public BrainSimulator(InputStream yamlStream) {
         Yaml yaml = new Yaml();
 
         Map<String, Object> object = yaml.load(yamlStream);
@@ -166,25 +166,26 @@ public class Application {
         }
     }
 
-    public class MainConfiguration extends RootObject {
-        @JsonProperty("PythonExecutable") public final String pythonExecutable;
-        @JsonProperty("NPythonWorkers") public final int nPythonWorkers;
-        @JsonProperty("UseCuda") public final boolean useCuda;
-        @JsonProperty("CudaDevice") public final int cudaDevice;
-        @JsonProperty("TrainingAllowed") public final boolean trainingAllowed;
-        @JsonProperty("PreloadModelEnabled") public final boolean preloadModelEnabled;
-        @JsonProperty("PreloadModelFrom") public final String preloadModelFrom;
-        @JsonProperty("ErrorOnInconsistentModel") public final boolean errorOnInconsistentModel;
-        @JsonProperty("ErrorOnDifferentOptimization") public final boolean errorOnDifferentOptimization;
-        @JsonProperty("SaveCheckpointsEnabled") public final boolean saveCheckpointsEnabled;
-        @JsonProperty("SaveCheckpointsTo") public final String saveCheckpointsTo;
-        @JsonProperty("SaveCheckpointsFileNamePrefix") public final String saveCheckpointsFileNamePrefix;
-        @JsonProperty("SaveCheckpointsFrequency") public final long saveCheckpointsFrequency;
-        @JsonProperty("LogTo") public final String logTo;
-        @JsonProperty("LogFileNamePrefix") public final String logFileNamePrefix;
-        @JsonProperty("NRotatingLogs") public final int nRotatingLogs;
-        @JsonProperty("MaxSizePerLog") public final int maxSizePerLog;
-        @JsonProperty("LogVerbosity") public final LogVerbosity logVerbosity;
+    public record MainConfiguration(
+        @JsonProperty("PythonExecutable") String pythonExecutable,
+        @JsonProperty("NPythonWorkers") int nPythonWorkers,
+        @JsonProperty("UseCuda") boolean useCuda,
+        @JsonProperty("CudaDevice") int cudaDevice,
+        @JsonProperty("TrainingAllowed") boolean trainingAllowed,
+        @JsonProperty("PreloadModelEnabled") boolean preloadModelEnabled,
+        @JsonProperty("PreloadModelFrom") String preloadModelFrom,
+        @JsonProperty("ErrorOnInconsistentModel") boolean errorOnInconsistentModel,
+        @JsonProperty("ErrorOnDifferentOptimization") boolean errorOnDifferentOptimization,
+        @JsonProperty("SaveCheckpointsEnabled") boolean saveCheckpointsEnabled,
+        @JsonProperty("SaveCheckpointsTo") String saveCheckpointsTo,
+        @JsonProperty("SaveCheckpointsFileNamePrefix") String saveCheckpointsFileNamePrefix,
+        @JsonProperty("SaveCheckpointsFrequency") long saveCheckpointsFrequency,
+        @JsonProperty("LogTo") String logTo,
+        @JsonProperty("LogFileNamePrefix") String logFileNamePrefix,
+        @JsonProperty("NRotatingLogs") int nRotatingLogs,
+        @JsonProperty("MaxSizePerLog") int maxSizePerLog,
+        @JsonProperty("LogVerbosity") LogVerbosity logVerbosity
+    ) {
 
         public static enum LogVerbosity {
             LOW,
@@ -192,50 +193,7 @@ public class Application {
             HIGH
         };
 
-        @JsonCreator
-        public MainConfiguration (
-            @JsonProperty("Name") String name,
-            @JsonProperty("PythonExecutable") String pythonExecutable,
-            @JsonProperty("NPythonWorkers") int nPythonWorkers,
-            @JsonProperty("UseCuda") boolean useCuda,
-            @JsonProperty("CudaDevice") int cudaDevice,
-            @JsonProperty("TrainingAllowed") boolean trainingAllowed,
-            @JsonProperty("PreloadModelEnabled") boolean preloadModelEnabled,
-            @JsonProperty("PreloadModelFrom") String preloadModelFrom,
-            @JsonProperty("ErrorOnInconsistentModel") boolean errorOnInconsistentModel,
-            @JsonProperty("ErrorOnDifferentOptimization") boolean errorOnDifferentOptimization,
-            @JsonProperty("SaveCheckpointsEnabled") boolean saveCheckpointsEnabled,
-            @JsonProperty("SaveCheckpointsTo") String saveCheckpointsTo,
-            @JsonProperty("SaveCheckpointsFileNamePrefix") String saveCheckpointsFileNamePrefix,
-            @JsonProperty("SaveCheckpointsFrequency") int saveCheckpointsFrequency,
-            @JsonProperty("LogTo") String logTo,
-            @JsonProperty("LogFileNamePrefix") String logFileNamePrefix,
-            @JsonProperty("NRotatingLogs") int nRotatingLogs,
-            @JsonProperty("MaxSizePerLog") int maxSizePerLog,
-            @JsonProperty("LogVerbosity") LogVerbosity logVerbosity
-        ) {
-            super(name);
-            this.pythonExecutable = pythonExecutable;
-            this.nPythonWorkers = nPythonWorkers;
-            this.useCuda = useCuda;
-            this.cudaDevice = cudaDevice;
-            this.trainingAllowed = trainingAllowed;
-            this.preloadModelEnabled = preloadModelEnabled;
-            this.preloadModelFrom = preloadModelFrom;
-            this.errorOnInconsistentModel = errorOnInconsistentModel;
-            this.errorOnDifferentOptimization = errorOnDifferentOptimization;
-            this.saveCheckpointsEnabled = saveCheckpointsEnabled;
-            this.saveCheckpointsTo = saveCheckpointsTo;
-            this.saveCheckpointsFileNamePrefix = saveCheckpointsFileNamePrefix;
-            this.saveCheckpointsFrequency = saveCheckpointsFrequency;
-            this.logTo = logTo;
-            this.logFileNamePrefix = logFileNamePrefix;
-            this.nRotatingLogs = nRotatingLogs;
-            this.maxSizePerLog = maxSizePerLog;
-            this.logVerbosity = logVerbosity;
-        }
-
-        public static MainConfiguration loadFromApplicationConfig(Application app) {
+        public static MainConfiguration loadFromApplicationConfig(BrainSimulator app) {
             return app.new MainConfiguration(
                 app.getNestedField("main_config", "name"),
                 app.getNestedField("main_config", "python_executable"),

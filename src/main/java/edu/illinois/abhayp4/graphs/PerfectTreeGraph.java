@@ -1,5 +1,10 @@
+/**
+ * PerfectTreeGraph.java
+ * @author Abhay Pokhriyal
+ */
+
 package edu.illinois.abhayp4.graphs;
 
-class PerfectTreeGraph extends Graph {
+final class PerfectTreeGraph<T> extends Graph<T> {
     
 }

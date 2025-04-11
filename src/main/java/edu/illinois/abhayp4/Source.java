@@ -8,7 +8,7 @@ package edu.illinois.abhayp4;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 @JsonIgnoreType
-interface Source {
+sealed interface Source permits TextChannel {
     void setReceiveSignal(Object monitor);
     boolean hasMessage();
     String dequeue();

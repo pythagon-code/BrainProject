@@ -1,5 +1,10 @@
+/**
+ * FractalTreeGraph.java
+ * @author Abhay Pokhriyal
+ */
+
 package edu.illinois.abhayp4.graphs;
 
-class FractalTreeGraph extends Graph {
+final class FractalTreeGraph<T> extends Graph<T> {
     
 }
