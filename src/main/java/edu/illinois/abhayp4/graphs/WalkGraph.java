@@ -14,7 +14,7 @@ sealed class WalkGraph<T> extends Graph<T> permits CycleGraph {
         @JsonProperty("N") int n
     ) {
         if (n <= 0) {
-            throw new IllegalArgumentException("Argument n must be a positive value.");
+            throw new IllegalArgumentException("N must be positive");
         }
 
         addNode();

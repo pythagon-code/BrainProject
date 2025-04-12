@@ -8,15 +8,24 @@ package edu.illinois.abhayp4.graphs;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.IntSequenceGenerator.class,
+    property = "@id"
+)
 public final class GraphNode<T> {
-    private int nodeId;
+    @JsonProperty("@id") private int id;
     private final List<GraphNode<T>> adjacentNodes;
     @JsonIgnore public T data;
 
-    public GraphNode(int nodeId) {
-        this.nodeId = nodeId;
+    public GraphNode(
+        @JsonProperty("@id") int id
+    ) {
+        this.id = id;
         adjacentNodes = new ArrayList<>();
     }
 
@@ -24,9 +33,9 @@ public final class GraphNode<T> {
         return adjacentNodes;
     }
 
-    public void setAdjacentNode(GraphNode<T> node) {
+    void setAdjacentNode(GraphNode<T> node) {
         if (adjacentNodes.contains(node)) {
-            throw new IllegalArgumentException("Argument node is already adjacent.");
+            return;
         }
         
         adjacentNodes.add(node);
@@ -35,15 +44,13 @@ public final class GraphNode<T> {
 
     @Override
     public String toString() {
-        return "" + nodeId + ": " + adjacentNodes;
+        return "" + id + ": " + adjacentNodes;
     }
 
     @Override
     public boolean equals(Object other) {
         if (other instanceof GraphNode<?>) {
-
-
-            return adjacentNodes.equals(other) && (nodeId == ((GraphNode<?>) other).nodeId);
+            return adjacentNodes.equals(other) && (id == ((GraphNode<?>) other).id);
         }
         else {
             return false;

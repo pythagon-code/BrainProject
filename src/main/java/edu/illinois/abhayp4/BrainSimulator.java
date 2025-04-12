@@ -27,13 +27,15 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import edu.illinois.abhayp4.client.ModelClientPool;
+
 public final class BrainSimulator {
     private final Map<String, Object> config;
     public final MainConfiguration mainConfig;
     public final ModelConfiguration modelConfig;
     public final OptimizationConfiguration optimizationConfig;
     
-    public final ModelClientService modelClientService = null;
+    public final ModelClientPool modelClientService = null;
 
     private final ObjectWriter writer;
 
@@ -52,7 +54,7 @@ public final class BrainSimulator {
         Map<String, Object> object = yaml.load(yamlStream);
         config = (Map<String, Object>) object.get("application");
 
-        mainConfig = MainConfiguration.loadFromApplicationConfig(this);
+        mainConfig = MainConfiguration.loadFromApplicationConfiguration(this);
         modelConfig = null;
         optimizationConfig = null;
 
@@ -79,7 +81,7 @@ public final class BrainSimulator {
                 logFilePath, BYTES_PER_MB * mainConfig.maxSizePerLog, mainConfig.nRotatingLogs, true);
             fh.setFormatter(new SimpleFormatter());
 
-            logger = Logger.getLogger("application");
+            logger = Logger.getLogger("brain-simulation");
             logger.addHandler(fh);
         }
         catch (IOException e) {
@@ -193,42 +195,40 @@ public final class BrainSimulator {
             HIGH
         };
 
-        public static MainConfiguration loadFromApplicationConfig(BrainSimulator app) {
-            return app.new MainConfiguration(
-                app.getNestedField("main_config", "name"),
-                app.getNestedField("main_config", "python_executable"),
-                app.getNestedField("main_config", "n_python_workers"),
-                app.getNestedField("main_config", "use_cuda"),
-                app.getNestedField("main_config", "cuda_device"),
-                app.getNestedField("main_config", "training_allowed"),
-                app.getNestedField("main_config", "preload_model", "enabled"),
-                app.getNestedField("main_config", "preload_model", "from"),
-                app.getNestedField("main_config", "preload_model", "error_on_inconsistent_model"),
-                app.getNestedField("main_config", "preload_model", "error_on_different_optimization"),
-                app.getNestedField("main_config", "save_checkpoints", "enabled"),
-                app.getNestedField("main_config", "save_checkpoints", "to"),
-                app.getNestedFieldOrDefault("", "main_config", "save_checkpoints", "file_name_prefix"),
-                app.getNestedField("main_config", "save_checkpoints", "frequency"),
-                app.getNestedField("main_config", "log", "to"),
-                app.getNestedFieldOrDefault("", "main_config", "log", "file_name_prefix"),
-                app.getNestedField("main_config", "log", "n_rotating_logs"),
-                app.getNestedField("main_config", "log", "max_size_per_log"),
-                LogVerbosity.valueOf(((String) app.getNestedField("main_config", "log", "verbosity")).toUpperCase())
+        public static MainConfiguration loadFromApplicationConfiguration(BrainSimulator sim) {
+            return new MainConfiguration(
+                sim.getNestedField("main_config", "python_executable"),
+                sim.getNestedField("main_config", "n_python_workers"),
+                sim.getNestedField("main_config", "use_cuda"),
+                sim.getNestedField("main_config", "cuda_device"),
+                sim.getNestedField("main_config", "training_allowed"),
+                sim.getNestedField("main_config", "preload_model", "enabled"),
+                sim.getNestedField("main_config", "preload_model", "from"),
+                sim.getNestedField("main_config", "preload_model", "error_on_inconsistent_model"),
+                sim.getNestedField("main_config", "preload_model", "error_on_different_optimization"),
+                sim.getNestedField("main_config", "save_checkpoints", "enabled"),
+                sim.getNestedField("main_config", "save_checkpoints", "to"),
+                sim.getNestedFieldOrDefault("", "main_config", "save_checkpoints", "file_name_prefix"),
+                sim.getNestedField("main_config", "save_checkpoints", "frequency"),
+                sim.getNestedField("main_config", "log", "to"),
+                sim.getNestedFieldOrDefault("", "main_config", "log", "file_name_prefix"),
+                sim.getNestedField("main_config", "log", "n_rotating_logs"),
+                sim.getNestedField("main_config", "log", "max_size_per_log"),
+                LogVerbosity.valueOf(((String) sim.getNestedField("main_config", "log", "verbosity")).toUpperCase())
             );
         }
     }
 
-    public class ModelConfiguration extends RootObject {
+    public class ModelConfiguration {
         @JsonCreator
         public ModelConfiguration(@JsonProperty("Name") String name) {
-            super(name);
         }
     }
 
-    public class OptimizationConfiguration extends RootObject {
+    public class OptimizationConfiguration {
         @JsonCreator
-        public OptimizationConfiguration(@JsonProperty("Name") String name) {
-            super(name);
+        public OptimizationConfiguration() {
+        
         }
     }
 
@@ -248,7 +248,7 @@ public final class BrainSimulator {
         Object current = config;
         for (String field : path) {
             if (current == null || !(current instanceof Map)) {
-                throw new NoSuchElementException("Missing field in path " + Arrays.toString(path) + " in application.yml");
+                throw new NoSuchElementException("Missing field in path " + Arrays.toString(path) + " in configuration");
             }
             current = ((Map<String, Object>) current).get(field); 
         }

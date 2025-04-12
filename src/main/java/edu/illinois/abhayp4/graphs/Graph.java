@@ -6,9 +6,9 @@
 package edu.illinois.abhayp4.graphs;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -26,8 +26,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = WheelGraph.class),
     @JsonSubTypes.Type(value = CustomGraph.class)
 })
-sealed abstract class Graph<T> permits PerfectTreeGraph, FractalTreeGraph, WalkGraph, CompleteGraph, CustomGraph {
-    @JsonIgnore protected List<GraphNode<T>> nodes;
+public sealed abstract class Graph<T> implements Iterable<GraphNode<T>>
+    permits PerfectTreeGraph, FractalTreeGraph, WalkGraph, CompleteGraph, CustomGraph
+{
+    protected List<GraphNode<T>> nodes;
 
     public Graph() {
         nodes = new ArrayList<>();
@@ -39,8 +41,8 @@ sealed abstract class Graph<T> permits PerfectTreeGraph, FractalTreeGraph, WalkG
         return node;
     }
 
-    public Iterable<GraphNode<T>> getNodes() {
-        return nodes;
+    public Iterator<GraphNode<T>> iterator() {
+        return nodes.iterator();
     }
 
     @Override
