@@ -1,0 +1,3 @@
+Your logs will be saved under this folder.
+
+*This folder is for testing.
