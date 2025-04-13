@@ -1,5 +1,5 @@
 /**
- * MessageChannel.java
+ * SourceChannel.java
  * @author Abhay Pokhriyal
  */
 
@@ -8,10 +8,8 @@ package edu.illinois.abhayp4.channels;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 @JsonIgnoreType
-public interface MessageChannel {
+public sealed interface SourceDataChannel permits SimplexChannel {
     void setMessageAvailableMonitor(Object monitor);
-    void addMessage(String message);
     String removeMessage();
-    boolean canAddMessage();
-    boolean canRemoveMessage();
+    boolean hasMessage();
 }

@@ -1,4 +1,4 @@
-package edu.illinois.abhayp4;
+package edu.illinois.abhayp4.brain;
 
 import java.io.File;
 import java.io.IOError;
@@ -27,7 +27,8 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import edu.illinois.abhayp4.client.ModelClientPool;
+import edu.illinois.abhayp4.neurons.ResponseNeuron;
+import edu.illinois.abhayp4.models.ModelClientPool;
 
 public final class BrainSimulator {
     private final Map<String, Object> config;
@@ -113,7 +114,7 @@ public final class BrainSimulator {
             checkpointsFolderPath = null;
         }
 
-        saveCheckpoint(new ResponseNeuron("hi"));
+        saveCheckpoint(new ResponseNeuron());
 
         try {
             System.out.println(writer.writeValueAsString(mainConfig));

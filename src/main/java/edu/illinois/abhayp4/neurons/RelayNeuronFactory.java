@@ -1,3 +1,8 @@
+/**
+ * RelayNeuronFactory.java
+ * @author Abhay Pokhriyal
+ */
+
 package edu.illinois.abhayp4.neurons;
 
 import java.util.ArrayList;
@@ -10,12 +15,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.illinois.abhayp4.graphs.Graph;
 import edu.illinois.abhayp4.graphs.GraphNode;
 
-public class NeuronFactory {
-    @JsonProperty("Graphs") private final Graph<RelayNeuron>[] graphs;
+public class RelayNeuronFactory {
+    @JsonProperty("Graphs") private final List<Graph<RelayNeuron>> graphs;
     private final Map<RelayNeuron, List<RelayNeuron>> adjacency;
 
-    public NeuronFactory(
-        @JsonProperty("Graphs") Graph<RelayNeuron>[] graphs
+    public RelayNeuronFactory(
+        @JsonProperty("Graphs") List<Graph<RelayNeuron>> graphs
     ) {
         this.graphs = graphs;
         adjacency = new HashMap<>();
@@ -28,5 +33,9 @@ public class NeuronFactory {
                 adjacency.put(node.data, adjacentNodes);
             }
         }
+    }
+
+    public void build() {
+        
     }
 }

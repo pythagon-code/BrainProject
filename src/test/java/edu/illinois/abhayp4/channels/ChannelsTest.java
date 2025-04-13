@@ -1,9 +1,9 @@
 /**
- * MyTest.java
+ * JacksonTest.java
  * @author Abhay Pokhriyal
  */
 
-package edu.illinois.abhayp4;
+package edu.illinois.abhayp4.channels;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -12,9 +12,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
 
-import edu.illinois.abhayp4.channels.DuplexChannel;
-
-public class MyTest {
+public class ChannelsTest {
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
     private static class MyClass1 {
         private final int i, j, k;
@@ -49,7 +47,7 @@ public class MyTest {
     public void testJackson1() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         MyClass1 obj = new MyClass1(1, 2, 3);
-        obj.channel = new DuplexChannel("hello");
+        obj.channel = new DuplexChannel(10);
         String json = objectMapper.writeValueAsString(obj);
         MyClass1 obj2 = objectMapper.readValue(json, MyClass1.class);
         assertNotEquals(obj, obj2);
@@ -88,10 +86,12 @@ public class MyTest {
     }
 
     private static class MyClass2Child extends MyClass2 {
+        @JsonProperty("J") final private int j = 0;
 
         @JsonCreator
         public MyClass2Child(
-            @JsonProperty("i") int i
+            @JsonProperty("i") int i,
+            @JsonProperty("J") int j
         ) {
             super(i, 0);
         }
@@ -110,7 +110,7 @@ public class MyTest {
     @Test
     public void testJacksonSubclass1() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        MyClass2Child obj = new MyClass2Child(10);
+        MyClass2Child obj = new MyClass2Child(10, 20);
         String json = objectMapper.writeValueAsString(obj);
         MyClass2Child obj2 = objectMapper.readValue(json, MyClass2Child.class);
         assertEquals(obj, obj2);

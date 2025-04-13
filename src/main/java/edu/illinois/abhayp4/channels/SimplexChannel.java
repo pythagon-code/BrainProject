@@ -11,7 +11,7 @@ import java.util.Queue;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 @JsonIgnoreType
-public class SimplexChannel implements MessageChannel {
+public final class SimplexChannel implements SourceDataChannel, TargetDataChannel {
     public Queue<String> queue;
     public final int capacity;
     private Object messageAvailableMonitor;
@@ -23,48 +23,47 @@ public class SimplexChannel implements MessageChannel {
 
     @Override
     public void setMessageAvailableMonitor(Object monitor) {
-        if (monitor != null) {
-            throw new IllegalThreadStateException();
+        if (messageAvailableMonitor != null) {
+            throw new IllegalStateException();
         }
 
         this.messageAvailableMonitor = monitor;
     }
 
     @Override
-    public void addMessage(String message) {
-        
-            if (!canAddMessage()) {
-                throw new IllegalStateException();
-            }
-
-            queue.add(message);
-            messageAvailableMonitor.notifyAll();
-    }
-
-    @Override
     public String removeMessage() {
-        if (!canRemoveMessage()) {
+        if (!hasMessage()) {
             throw new IllegalStateException();
         }
 
         return queue.remove();
     }
-
+    
     @Override
-    public boolean canAddMessage() {
-        if (!Thread.holdsLock(this)) {
-            throw new IllegalMonitorStateException();
-        }
-        
-        return queue.size() < capacity;
-    }
-
-    @Override
-    public boolean canRemoveMessage() {
+    public boolean hasMessage() {
         if (!Thread.holdsLock(this)) {
             throw new IllegalMonitorStateException();
         }
 
         return !queue.isEmpty();
+    }
+
+    @Override
+    public void addMessage(String message) {
+        if (!hasSpace()) {
+            throw new IllegalStateException();
+        }
+
+        queue.add(message);
+        messageAvailableMonitor.notifyAll();
+    }
+
+    @Override
+    public boolean hasSpace() {
+        if (!Thread.holdsLock(this)) {
+            throw new IllegalMonitorStateException();
+        }
+        
+        return queue.size() < capacity;
     }
 }

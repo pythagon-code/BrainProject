@@ -3,7 +3,7 @@
  * @author Abhay Pokhriyal
  */
 
-package edu.illinois.abhayp4.client;
+package edu.illinois.abhayp4.models;
 
 import java.io.Closeable;
 

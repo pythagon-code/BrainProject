@@ -6,42 +6,36 @@
 package edu.illinois.abhayp4.neurons;
 
 import java.io.Closeable;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import edu.illinois.abhayp4.channels.DuplexChannel;
-import edu.illinois.abhayp4.channels.MessageChannel;
-import edu.illinois.abhayp4.client.ModelClient;
+import edu.illinois.abhayp4.channels.SourceDataChannel;
+import edu.illinois.abhayp4.channels.TargetDataChannel;
+import edu.illinois.abhayp4.models.ModelClient;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.MINIMAL_CLASS,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "@name"
+    include = JsonTypeInfo.As.PROPERTY
 )
 @JsonSubTypes({
     @JsonSubTypes.Type(value = BaseNeuron.class),
     @JsonSubTypes.Type(value = MetaNeuron.class),
     @JsonSubTypes.Type(value = ResponseNeuron.class)
 })
-@JsonIdentityInfo(
-    generator = ObjectIdGenerators.IntSequenceGenerator.class,
-    property = "@id"
-)
 sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeuron {
-    protected final List<DuplexChannel> channels;
+    private final List<SourceDataChannel> sources;
+    private final List<TargetDataChannel> targets;
     private final Thread thread;
     private final ModelClient modelClient;
     private boolean awaken = false;
     private boolean done = false;
 
     public RelayNeuron() {
-        channels = new ArrayList<>();
+        sources = new ArrayList<>();
+        targets = new ArrayList<>();
 
         thread = new Thread(this, "RelayNeuron-NeuronThread");
         thread.setDaemon(false);
@@ -50,12 +44,20 @@ sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeu
         done = false;
     }
 
-    public void addChannel(DuplexChannel channel) {
-        if (channels.contains(channel)) {
+    public void addSource(SourceDataChannel source) {
+        if (sources.contains(source)) {
             throw new IllegalArgumentException();
         }
 
-        channels.add(channel);
+        sources.add(source);
+    }
+
+    public void addTarget(TargetDataChannel target) {
+        if (targets.contains(target)) {
+            throw new IllegalArgumentException();
+        }
+
+        targets.add(target);
     }
 
     public void start() {
@@ -74,10 +76,10 @@ sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeu
     }
 
     protected void sendMessage(int channelIdx, String message) {
-        MessageChannel channel = channels.get(channelIdx);
-        synchronized (channel) {
-            if (channel.canAddMessage()) {
-                channel.addMessage(message);
+        TargetDataChannel target = targets.get(channelIdx);
+        synchronized (target) {
+            if (target.hasSpace()) {
+                target.addMessage(message);
             }
             else {
                 onMessageNotSent();
@@ -87,18 +89,18 @@ sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeu
 
     @Override
     public void run() {
-        for (DuplexChannel channel : channels) {
-            channel.bindThread();
+        for (SourceDataChannel source : sources) {
+            source.setMessageAvailableMonitor(this);   
         }
 
         do {
             synchronized (this) {
                 try {
-                    for (int i = 0; i < channels.size(); i++) {
-                        MessageChannel channel = channels.get(i);
-                        synchronized (channel) {
-                            while (channel.canRemoveMessage()) {
-                                onMessageReceived(i, channel.removeMessage());
+                    for (int i = 0; i < sources.size(); i++) {
+                        SourceDataChannel source = sources.get(i);
+                        synchronized (source) {
+                            while (source.hasMessage()) {
+                                onMessageReceived(i, source.removeMessage());
                                 awaken = false;
                             }
                         }
