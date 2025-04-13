@@ -3,9 +3,6 @@
 /bin/
 /build/
 
-# Generic output
-/out/
-
 # VS Code specific
 /.vscode/
 
@@ -17,4 +14,4 @@
 !**/info.txt
 
 # Use this directory for local testing and temporary files
-/local/
+/dev/
