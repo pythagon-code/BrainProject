@@ -1,3 +1,0 @@
-Your checkpoints will be saved under this folder in JSON format.
-
-*This is for testing only.
