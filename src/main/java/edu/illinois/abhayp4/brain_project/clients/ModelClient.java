@@ -209,17 +209,12 @@ public final class ModelClient implements Closeable {
     }
 
     private synchronized void send(String json) {
-        serverOut.write(json);
-        serverOut.flush();
+        serverOut.println(json);
     }
 
     private void send(ModelClientInputData data) {
         String json = getJson(data);
-
-        synchronized (this) {
-            serverOut.write(json);
-            serverOut.flush();
-        }
+        send(json);
     }
 
     private String getJson(ModelClientInputData data) {
