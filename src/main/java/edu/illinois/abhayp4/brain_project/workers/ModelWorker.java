@@ -1,9 +1,9 @@
 /**
- * ModelClient.java
+ * ModelWorker.java
  * @author Abhay Pokhriyal
  */
 
-package edu.illinois.abhayp4.brain_project.clients;
+package edu.illinois.abhayp4.brain_project.workers;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 @JsonIgnoreType
-public final class ModelClient implements Closeable {
+public final class ModelWorker implements Closeable {
     private final Socket socket;
     private final Process process;
     private final BufferedReader serverIn;
@@ -41,7 +41,7 @@ public final class ModelClient implements Closeable {
 
     private final ModelClientInputData startRound, endRound, shutdown;
 
-    public ModelClient() {
+    public ModelWorker() {
         try {
             ServerSocket serverSocket = new ServerSocket(0);
             int port = serverSocket.getLocalPort();

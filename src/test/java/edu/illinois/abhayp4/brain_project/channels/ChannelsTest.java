@@ -3,10 +3,10 @@
  * @author Abhay Pokhriyal
  */
 
-package edu.illinois.abhayp4.channels;
+package edu.illinois.abhayp4.brain_project.channels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.annotation.*;

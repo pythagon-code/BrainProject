@@ -30,7 +30,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public sealed abstract class Graph<T> implements Iterable<GraphNode<T>>
     permits TreeGraph, WalkGraph, CompleteGraph, CustomGraph
 {
-    protected List<GraphNode<T>> nodes;
+    protected final List<GraphNode<T>> nodes;
+
+    public Graph() {
+        nodes = new ArrayList<>();
+    }
 
     public Graph(
         @JsonProperty("GraphData") List<T> graphData

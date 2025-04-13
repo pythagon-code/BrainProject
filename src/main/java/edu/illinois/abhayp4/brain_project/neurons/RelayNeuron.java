@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import edu.illinois.abhayp4.brain_project.channels.SourceDataChannel;
 import edu.illinois.abhayp4.brain_project.channels.TargetDataChannel;
-import edu.illinois.abhayp4.brain_project.clients.ModelClient;
+import edu.illinois.abhayp4.brain_project.workers.ModelWorker;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.MINIMAL_CLASS,
@@ -29,7 +29,7 @@ sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeu
     private final List<SourceDataChannel> sources;
     private final List<TargetDataChannel> targets;
     private final Thread thread;
-    private final ModelClient modelClient;
+    private final ModelWorker modelClient;
     private boolean awaken = false;
     private boolean done = false;
 
