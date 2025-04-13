@@ -3,7 +3,7 @@
  * @author Abhay Pokhriyal
  */
 
-package edu.illinois.abhayp4.neurons;
+package edu.illinois.abhayp4.brain_project.neurons;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +12,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import edu.illinois.abhayp4.graphs.Graph;
-import edu.illinois.abhayp4.graphs.GraphNode;
+import edu.illinois.abhayp4.brain_project.graphs.Graph;
+import edu.illinois.abhayp4.brain_project.graphs.GraphNode;
 
 public class RelayNeuronFactory {
     @JsonProperty("Graphs") private final List<Graph<RelayNeuron>> graphs;

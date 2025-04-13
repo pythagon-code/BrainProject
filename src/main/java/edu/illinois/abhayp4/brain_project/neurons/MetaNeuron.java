@@ -3,14 +3,13 @@
  * @author Abhay Pokhriyal
  */
 
-package edu.illinois.abhayp4.neurons;
+package edu.illinois.abhayp4.brain_project.neurons;
 
 import java.util.ArrayList;
 import java.util.List;
 
 sealed class MetaNeuron extends RelayNeuron permits ResponseNeuron {
     private List<RelayNeuron> neurons;
-    
     
     public MetaNeuron() {
         neurons = new ArrayList<>();

@@ -3,7 +3,7 @@
  * @author Abhay Pokhriyal
  */
 
-package edu.illinois.abhayp4.neurons;
+package edu.illinois.abhayp4.brain_project.neurons;
 
 import java.io.Closeable;
 import java.util.ArrayList;
@@ -12,9 +12,9 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import edu.illinois.abhayp4.channels.SourceDataChannel;
-import edu.illinois.abhayp4.channels.TargetDataChannel;
-import edu.illinois.abhayp4.clients.ModelClient;
+import edu.illinois.abhayp4.brain_project.channels.SourceDataChannel;
+import edu.illinois.abhayp4.brain_project.channels.TargetDataChannel;
+import edu.illinois.abhayp4.brain_project.clients.ModelClient;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.MINIMAL_CLASS,

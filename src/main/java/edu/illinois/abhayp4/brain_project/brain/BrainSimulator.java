@@ -1,4 +1,4 @@
-package edu.illinois.abhayp4.brain;
+package edu.illinois.abhayp4.brain_project.brain;
 
 import java.io.File;
 import java.io.IOError;
@@ -27,8 +27,8 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import edu.illinois.abhayp4.clients.ModelClientPool;
-import edu.illinois.abhayp4.neurons.ResponseNeuron;
+import edu.illinois.abhayp4.brain_project.clients.ModelClientPool;
+import edu.illinois.abhayp4.brain_project.neurons.ResponseNeuron;
 
 public final class BrainSimulator {
     private final Map<String, Object> config;

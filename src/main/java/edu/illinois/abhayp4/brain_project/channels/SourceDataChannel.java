@@ -3,7 +3,7 @@
  * @author Abhay Pokhriyal
  */
 
-package edu.illinois.abhayp4.channels;
+package edu.illinois.abhayp4.brain_project.channels;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
