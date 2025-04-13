@@ -10,8 +10,8 @@
 /.vscode/
 
 # Generated models and log files
-/user_data/checkpoints/*
-/user_data/logs/*
+**/checkpoints/*
+**/logs/*
 
 # Keep info.txt files
 !**/info.txt
