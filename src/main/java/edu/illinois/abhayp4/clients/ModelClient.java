@@ -3,7 +3,7 @@
  * @author Abhay Pokhriyal
  */
 
-package edu.illinois.abhayp4.models;
+package edu.illinois.abhayp4.clients;
 
 import java.net.ServerSocket;
 import java.net.Socket;

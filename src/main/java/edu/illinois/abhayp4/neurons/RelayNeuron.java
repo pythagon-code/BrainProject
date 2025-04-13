@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import edu.illinois.abhayp4.channels.SourceDataChannel;
 import edu.illinois.abhayp4.channels.TargetDataChannel;
-import edu.illinois.abhayp4.models.ModelClient;
+import edu.illinois.abhayp4.clients.ModelClient;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.MINIMAL_CLASS,

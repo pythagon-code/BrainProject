@@ -27,8 +27,8 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import edu.illinois.abhayp4.clients.ModelClientPool;
 import edu.illinois.abhayp4.neurons.ResponseNeuron;
-import edu.illinois.abhayp4.models.ModelClientPool;
 
 public final class BrainSimulator {
     private final Map<String, Object> config;

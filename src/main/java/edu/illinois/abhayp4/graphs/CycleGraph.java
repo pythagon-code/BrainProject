@@ -22,7 +22,7 @@ sealed class CycleGraph<T> extends WalkGraph<T> permits WheelGraph {
         if (n <= 2) {
             throw new IllegalArgumentException();
         }
-
+        
         nodes.getFirst().setAdjacentNode(nodes.getLast());
 
         populateData(graphData, CycleGraph.class);
