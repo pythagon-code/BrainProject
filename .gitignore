@@ -9,8 +9,8 @@
 # IntelliJ specific
 /.idea/
 
-# Generated models and log files
-**/checkpoints/*
+# Generated model history and log files
+**/history/*
 **/logs/*
 
 # Keep info.txt files
