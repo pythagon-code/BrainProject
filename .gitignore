@@ -6,12 +6,19 @@
 # VS Code specific
 /.vscode/
 
+# IntelliJ specific
+/.idea/
+
 # Generated models and log files
 **/checkpoints/*
 **/logs/*
 
 # Keep info.txt files
 !**/info.txt
+
+# OS cache files
+.DS_Store
+Thumbs.db
 
 # Use this directory for local testing and temporary files
 /dev/
