@@ -1,8 +1,3 @@
-/**
- * JacksonTest.java
- * @author Abhay Pokhriyal
- */
-
 package edu.illinois.abhayp4.brain_project.channels;
 
 import org.junit.jupiter.api.Test;
