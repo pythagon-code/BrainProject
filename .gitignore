@@ -9,12 +9,9 @@
 # IntelliJ specific
 /.idea/
 
-# Generated model history and log files
-**/history/*
-**/logs/*
-
-# Keep info.txt files
-!**/info.txt
+# Generated output data and logs
+/data/
+/mock/data/
 
 # OS cache files
 .DS_Store

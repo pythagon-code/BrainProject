@@ -12,9 +12,9 @@ application:
             from: ./user_data/pretrained/model1.json  # File path to the model file
             error_on_inconsistent_model: no  # Error if the model parameters are inconsistent, otherwise, preload old parameters
             error_on_different_optimization: no  # Error if the optimization parameters are different, otherwise, train with new parameters
-        save_checkpoints:
-            enabled: yes  # Save model checkpoints frequently
-            to: ./user_data/checkpoints/  # Folder path to save checkpoints
+        save_backups:
+            enabled: yes  # Save model backups frequently
+            to: ./data/backups/  # Folder path to save checkpoints
             file_name_prefix: ~  # File name prefix for checkpoints ("~"" for default value, none)
             frequency: 120  # Delay between checkpoints (seconds)
         log:
