@@ -1,1 +1,0 @@
-Your model checkpoints will be saved under this folder in JSON format.
