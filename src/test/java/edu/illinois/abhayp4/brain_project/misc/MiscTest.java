@@ -1,4 +1,4 @@
-package edu.illinois.abhayp4.brain_project.channels;
+package edu.illinois.abhayp4.brain_project.misc;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,7 +7,9 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
 
-public class ChannelsTest {
+import edu.illinois.abhayp4.brain_project.channels.DuplexChannel;
+
+public class MiscTest {
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
     private static class MyClass1 {
         private final int i, j, k;
