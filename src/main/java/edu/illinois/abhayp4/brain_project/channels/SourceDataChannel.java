@@ -8,7 +8,7 @@ package edu.illinois.abhayp4.brain_project.channels;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 @JsonIgnoreType
-public sealed interface SourceDataChannel permits SimplexChannel {
+public sealed interface SourceDataChannel permits SimplexDataChannel {
     void setMessageAvailableMonitor(Object monitor);
     String removeMessage();
     boolean hasMessage();

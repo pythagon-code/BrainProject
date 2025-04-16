@@ -7,14 +7,14 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
 
-import edu.illinois.abhayp4.brain_project.channels.DuplexChannel;
+import edu.illinois.abhayp4.brain_project.channels.DuplexDataChannel;
 
 public class JacksonTest {
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
     private static class MyClass1 {
         private final int i, j, k;
         public final int l;
-        public DuplexChannel channel;
+        public DuplexDataChannel channel;
 
         @JsonCreator
         public MyClass1(
@@ -44,7 +44,7 @@ public class JacksonTest {
     public void testJackson1() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         MyClass1 obj = new MyClass1(1, 2, 3);
-        obj.channel = new DuplexChannel(10);
+        obj.channel = new DuplexDataChannel(10);
         String json = objectMapper.writeValueAsString(obj);
         MyClass1 obj2 = objectMapper.readValue(json, MyClass1.class);
         assertNotEquals(obj, obj2);
