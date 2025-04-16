@@ -44,12 +44,12 @@ public final class BrainSimulator {
 
     private final String checkpointsFolderPath;
 
-    public static final Level LOW = new Level("LOW", Level.INFO.intValue() + 1) {};
-    public static final Level MEDIUM = new Level("MEDIUM", LOW.intValue() + 1) {};
-    public static final Level HIGH = new Level("HIGH", MEDIUM.intValue() + 1) {};
+    public static final Level LOW = new Level("LOW", Level.INFO.intValue() + 1) { };
+    public static final Level MEDIUM = new Level("MEDIUM", LOW.intValue() + 1) { };
+    public static final Level HIGH = new Level("HIGH", MEDIUM.intValue() + 1) { };
 
     @SuppressWarnings("unchecked")
-    public BrainSimulator(InputStream yamlStream) {
+    public BrainSimulator(StreamBundle streams) {
         Yaml yaml = new Yaml();
 
         Map<String, Object> object = yaml.load(yamlStream);

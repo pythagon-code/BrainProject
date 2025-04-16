@@ -272,7 +272,7 @@ public final class ModelWorker implements Closeable {
     }
 }
 
-record ModelClientInputData(
+record ModelWorkerInputData(
     @JsonProperty("Operation") String operation,
     @JsonProperty("ModelId") int modelId,
     @JsonProperty("Input") String input,
