@@ -270,16 +270,16 @@ public final class ModelWorker implements Closeable {
             throw new IllegalThreadStateException("Cannot interrupt during client close");
         }
     }
+
+    private record ModelWorkerInputData(
+        @JsonProperty("Operation") String operation,
+        @JsonProperty("ModelId") int modelId,
+        @JsonProperty("Input") String input,
+        @JsonProperty("Batch") List<ModelIdInputPair> batch
+    ) { }
+
+    private record ModelIdInputPair (
+        @JsonProperty("ModelId") int modelId,
+        @JsonProperty("Input") String input
+    ) { }
 }
-
-record ModelWorkerInputData(
-    @JsonProperty("Operation") String operation,
-    @JsonProperty("ModelId") int modelId,
-    @JsonProperty("Input") String input,
-    @JsonProperty("Batch") List<ModelIdInputPair> batch
-) { }
-
-record ModelIdInputPair (
-    @JsonProperty("ModelId") int modelId,
-    @JsonProperty("Input") String input
-) { }
