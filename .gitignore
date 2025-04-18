@@ -9,9 +9,9 @@
 # IntelliJ specific
 /.idea/
 
-# Generated output data and logs
-/data/
-/mock/data/
+# Generated output and logs
+/output/
+/mock/output/
 
 # OS cache files
 .DS_Store
