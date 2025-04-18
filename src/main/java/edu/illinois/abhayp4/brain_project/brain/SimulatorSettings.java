@@ -1,5 +1,7 @@
 package edu.illinois.abhayp4.brain_project.brain;
 
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +16,7 @@ public record SimulatorSettings(
     Map<String, Object> baseNeuronObject,
     Map<String, Object> graphStructuresObject,
     Map<String, Object> optimizationObject
-) implements AutoCloseable {
+) {
     public SimulatorSettings(Properties properties) throws IOException {
         this(
             properties.getProperty("system"),
@@ -37,6 +39,7 @@ public record SimulatorSettings(
             String optimizationFile
     ) throws IOException {
         this(
+            new Yaml(),
             new FileInputStream(systemFile),
             new FileInputStream(modelArchitectureFile),
             new FileInputStream(transformersFile),
@@ -48,55 +51,23 @@ public record SimulatorSettings(
     }
 
     public SimulatorSettings(
-            String systemFile,
-            String modelArchitectureFile,
-            String transformersFile,
-            String neuronTopologyFile,
-            String baseNeuronFile,
-            String graphStructuresFile,
-            String optimizationFile
-    ) throws IOException {
+            Yaml yaml,
+            InputStream systemStream,
+            InputStream modelArchitectureStream,
+            InputStream transformersStream,
+            InputStream neuronTopologyStream,
+            InputStream baseNeuronStream,
+            InputStream graphStructuresStream,
+            InputStream optimizationStream
+    ) {
         this(
-                new FileInputStream(systemFile),
-                new FileInputStream(modelArchitectureFile),
-                new FileInputStream(transformersFile),
-                new FileInputStream(neuronTopologyFile),
-                new FileInputStream(baseNeuronFile),
-                new FileInputStream(graphStructuresFile),
-                new FileInputStream(optimizationFile)
+            yaml.<Map<String, Object>>load(systemStream),
+            yaml.<Map<String, Object>>load(modelArchitectureStream),
+            yaml.<Map<String, Object>>load(transformersStream),
+            yaml.<Map<String, Object>>load(neuronTopologyStream),
+            yaml.<Map<String, Object>>load(baseNeuronStream),
+            yaml.<Map<String, Object>>load(graphStructuresStream),
+            yaml.<Map<String, Object>>load(optimizationStream)
         );
-    }
-
-    @Override
-    public void close() throws IOException {
-        IOException exception = null;
-
-        for (InputStream stream : new InputStream[] {
-                systemObject,
-                modelArchitectureObject,
-                transformers,
-                neuronTopologyStream,
-                baseNeuronStream,
-                graphStructuresStream,
-                optimizationStream
-        }) {
-            try {
-                if (stream != null) {
-                    stream.close();
-                }
-            }
-            catch (IOException e) {
-                if (exception == null) {
-                    exception = e;
-                }
-                else {
-                    exception.addSuppressed(e);
-                }
-            }
-        }
-
-        if (exception != null) {
-            throw exception;
-        }
     }
 }

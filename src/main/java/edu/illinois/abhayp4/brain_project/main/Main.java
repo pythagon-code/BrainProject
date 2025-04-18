@@ -13,10 +13,10 @@ public class Main {
             Properties properties = new Properties();
             properties.load(stream);
 
-            try (SimulatorSettings streams = new SimulatorSettings(properties)) {
-                BrainSimulator brain = new BrainSimulator(streams);
-                brain.start(false);
-            }
+            SimulatorSettings settings = new SimulatorSettings(properties);
+
+            BrainSimulator brain = new BrainSimulator(settings);
+            brain.start();
         }
     }
 }

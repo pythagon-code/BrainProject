@@ -39,7 +39,7 @@ public final class ModelWorker implements Closeable {
     private boolean done = false;
 
 
-    private final ModelClientInputData startRound, endRound, shutdown;
+    private final ModelWorkerInputData startRound, endRound, shutdown;
 
     public ModelWorker() {
         try {
@@ -70,9 +70,9 @@ public final class ModelWorker implements Closeable {
         inputBatch = new ArrayList<>();
         outputBatch = new ArrayDeque<>();
 
-        startRound = new ModelClientInputData("StartRound", -1, null, null);
-        endRound = new ModelClientInputData("EndRound", -1, null, null);
-        shutdown = new ModelClientInputData("Shutdown", -1, null, null);
+        startRound = new ModelWorkerInputData("StartRound", -1, null, null);
+        endRound = new ModelWorkerInputData("EndRound", -1, null, null);
+        shutdown = new ModelWorkerInputData("Shutdown", -1, null, null);
     }
 
     private void initializeClient() {
@@ -88,7 +88,7 @@ public final class ModelWorker implements Closeable {
             throw new IllegalStateException(e);
         } 
         
-        ModelClientInputData data = new ModelClientInputData(
+        ModelWorkerInputData data = new ModelWorkerInputData(
             "Initialize", -1, argumentsJson, null);
         
         boolean valid = sendAndReceive(data, boolean.class);
@@ -97,7 +97,7 @@ public final class ModelWorker implements Closeable {
             throw new IllegalStateException("Invalid client initialization");
         }
 
-        Thread thread = new Thread(() -> batch(), "ModelClient-BatchThread");
+        Thread thread = new Thread(() -> batch(), "ModelWorker-BatchThread");
         thread.setDaemon(true);
         thread.start();
     }
@@ -113,7 +113,7 @@ public final class ModelWorker implements Closeable {
             }
 
             synchronized (this) {
-                ModelClientInputData data = new ModelClientInputData(
+                ModelWorkerInputData data = new ModelWorkerInputData(
                     "GetBatch", -1, null, inputBatch);
 
                 Object[] output = sendAndReceive(data, Object[].class);
@@ -135,21 +135,21 @@ public final class ModelWorker implements Closeable {
     }
 
     public int createModel(String modelClass) {
-        ModelClientInputData data = new ModelClientInputData(
+        ModelWorkerInputData data = new ModelWorkerInputData(
             "SerializeModel", -1, modelClass, null);
         
         return sendAndReceive(data, int.class);
     }
     
     public void deserializeModel(int modelId) {
-        ModelClientInputData data = new ModelClientInputData(
+        ModelWorkerInputData data = new ModelWorkerInputData(
             "DeserializeModel", modelId, null, null);
         
         send(data);
     }
 
     public String serializeModel(int modelId, String encodedData) {
-        ModelClientInputData data = new ModelClientInputData(
+        ModelWorkerInputData data = new ModelWorkerInputData(
             "SerializeModel", modelId, null, null);
         
         return sendAndReceive(data, String.class);
@@ -188,13 +188,13 @@ public final class ModelWorker implements Closeable {
     }
 
     public Object[] getOutput(int modelId, String input) {
-        ModelClientInputData data = new ModelClientInputData(
+        ModelWorkerInputData data = new ModelWorkerInputData(
             "InvokeModel", modelId, input, null);
 
         return sendAndReceive(data, Object[].class);
     }
 
-    private <R> R sendAndReceive(ModelClientInputData data, Class<R> clazz) {
+    private <R> R sendAndReceive(ModelWorkerInputData data, Class<R> clazz) {
         String json = getJson(data);
 
         synchronized (this) {
@@ -212,12 +212,12 @@ public final class ModelWorker implements Closeable {
         serverOut.println(json);
     }
 
-    private void send(ModelClientInputData data) {
+    private void send(ModelWorkerInputData data) {
         String json = getJson(data);
         send(json);
     }
 
-    private String getJson(ModelClientInputData data) {
+    private String getJson(ModelWorkerInputData data) {
         String json;
         try {
             json = objectMapper.writeValueAsString(data);

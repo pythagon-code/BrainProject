@@ -17,6 +17,7 @@ public record SimulatorConfig(
     @JsonProperty("GraphStructuresConfig") GraphStructuresConfig graphStructuresConfig,
     @JsonProperty("OptimizationConfig") OptimizationConfig optimizationConfig
 ) {
+    @SuppressWarnings("unchecked")
     public SimulatorConfig(
         Map<String, Object> systemObject,
         Map<String, Object> modelArchitectureObject,
@@ -27,13 +28,13 @@ public record SimulatorConfig(
         Map<String, Object> optimizationObject
     ) {
         this(
-            new SystemConfig(systemObject),
-            new ModelArchitectureConfig(modelArchitectureObject),
-            new TransformersConfig(transformersObject),
-            new NeuronTopologyConfig(neuronTopologyObject),
-            new BaseNeuronConfig(baseNeuronObject),
-            new GraphStructuresConfig(graphStructuresObject),
-            new OptimizationConfig(optimizationObject)
+            new SystemConfig((Map<String, Object>) systemObject.get("system")),
+            new ModelArchitectureConfig((Map<String, Object>) modelArchitectureObject.get("modelArchitecture")),
+            new TransformersConfig((Map<String, Object>) transformersObject.get("transformers")),
+            new NeuronTopologyConfig((Map<String, Object>) neuronTopologyObject.get("neuronTopology")),
+            new BaseNeuronConfig((Map<String, Object>) baseNeuronObject.get("baseNeuron")),
+            new GraphStructuresConfig((Map<String, Object>) graphStructuresObject.get("graphStructures")),
+            new OptimizationConfig((Map<String, Object>) optimizationObject.get("optimization"))
         );
     }
 
