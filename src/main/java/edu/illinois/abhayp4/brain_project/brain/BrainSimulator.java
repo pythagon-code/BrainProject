@@ -3,12 +3,10 @@ package edu.illinois.abhayp4.brain_project.brain;
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -17,7 +15,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-
 import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -49,7 +46,7 @@ public final class BrainSimulator {
     public static final Level HIGH = new Level("HIGH", MEDIUM.intValue() + 1) { };
 
     @SuppressWarnings("unchecked")
-    public BrainSimulator(StreamBundle streams) {
+    public BrainSimulator(SimulatorSettings streams) {
         Yaml yaml = new Yaml();
 
         Map<String, Object> object = yaml.load(yamlStream);
