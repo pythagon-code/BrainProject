@@ -63,7 +63,7 @@ public record SimulatorConfig(
         @JsonProperty("SaveCheckpointsEnabled") boolean saveCheckpointsEnabled,
         @JsonProperty("SaveCheckpointsTo") String saveCheckpointsTo,
         @JsonProperty("SaveCheckpointsFileNamePrefix") String saveCheckpointsFileNamePrefix,
-        @JsonProperty("SaveCheckpointsFrequency") long saveCheckpointsFrequency,
+        @JsonProperty("SaveCheckpointsFrequency") int saveCheckpointsFrequency,
         @JsonProperty("LogTo") String logTo,
         @JsonProperty("LogFileNamePrefix") String logFileNamePrefix,
         @JsonProperty("NRotatingLogs") int nRotatingLogs,

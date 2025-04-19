@@ -5,5 +5,5 @@ import edu.illinois.abhayp4.brain_project.neurons.RelayNeuronFactory;
 
 record ModelCheckpoint(
     @JsonProperty("SimulatorConfig") SimulatorConfig simulatorConfig,
-    @JsonProperty("RelayNeuronFactory") RelayNeuronFactory relayNeuronFactory
+    @JsonProperty("NeuronFactory") RelayNeuronFactory neuronFactory
 ) { }

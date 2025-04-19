@@ -12,22 +12,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 @JsonIgnoreType
 public final class SimplexDataChannel implements SourceDataChannel, TargetDataChannel {
-    public Queue<String> queue;
+    private final Queue<String> queue;
     public final int capacity;
-    private Object messageAvailableMonitor;
 
     public SimplexDataChannel(int capacity) {
         queue = new ArrayDeque<>();
         this.capacity = capacity;
-    }
-
-    @Override
-    public void registerMessageAvailableMonitor(Object monitor) {
-        if (messageAvailableMonitor != null) {
-            throw new IllegalStateException();
-        }
-
-        this.messageAvailableMonitor = monitor;
     }
 
     @Override
@@ -55,7 +45,6 @@ public final class SimplexDataChannel implements SourceDataChannel, TargetDataCh
         }
 
         queue.add(message);
-        messageAvailableMonitor.notifyAll();
     }
 
     @Override

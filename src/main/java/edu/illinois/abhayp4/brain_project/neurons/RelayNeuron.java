@@ -29,7 +29,7 @@ sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeu
     private final List<SourceDataChannel> sources;
     private final List<TargetDataChannel> targets;
     private final Thread thread;
-    private final ModelWorker modelClient;
+    private final ModelWorker modelWorker;
     private boolean awaken = false;
     private boolean done = false;
 
@@ -40,7 +40,7 @@ sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeu
         thread = new Thread(this, "RelayNeuron-NeuronThread");
         thread.setDaemon(false);
 
-        modelClient = null;
+        modelWorker = null;
         done = false;
     }
 
@@ -89,10 +89,6 @@ sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeu
 
     @Override
     public void run() {
-        for (SourceDataChannel source : sources) {
-            source.registerMessageAvailableMonitor(this);
-        }
-
         do {
             synchronized (this) {
                 try {
@@ -128,7 +124,6 @@ sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeu
             thread.join();
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
             throw new IllegalThreadStateException(e.getMessage());
         }
     }
