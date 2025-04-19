@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
 @JsonIgnoreType
 public sealed interface SourceDataChannel permits SimplexDataChannel {
-    void setMessageAvailableMonitor(Object monitor);
+    void registerMessageAvailableMonitor(Object monitor);
     String removeMessage();
     boolean hasMessage();
 }

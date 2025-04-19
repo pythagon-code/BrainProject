@@ -17,6 +17,18 @@ public record SimulatorConfig(
     @JsonProperty("GraphStructuresConfig") GraphStructuresConfig graphStructuresConfig,
     @JsonProperty("OptimizationConfig") OptimizationConfig optimizationConfig
 ) {
+    public SimulatorConfig(SimulatorSettings settings) {
+        this(
+            settings.systemObject(),
+            settings.modelArchitectureObject(),
+            settings.transformersObject(),
+            settings.neuronTopologyObject(),
+            settings.baseNeuronObject(),
+            settings.graphStructuresObject(),
+            settings.optimizationObject()
+        );
+    }
+
     @SuppressWarnings("unchecked")
     public SimulatorConfig(
         Map<String, Object> systemObject,

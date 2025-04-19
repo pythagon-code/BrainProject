@@ -90,7 +90,7 @@ sealed abstract class RelayNeuron implements Runnable, Closeable permits MetaNeu
     @Override
     public void run() {
         for (SourceDataChannel source : sources) {
-            source.setMessageAvailableMonitor(this);   
+            source.registerMessageAvailableMonitor(this);
         }
 
         do {

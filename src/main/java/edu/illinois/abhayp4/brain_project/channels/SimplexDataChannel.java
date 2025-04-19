@@ -22,7 +22,7 @@ public final class SimplexDataChannel implements SourceDataChannel, TargetDataCh
     }
 
     @Override
-    public void setMessageAvailableMonitor(Object monitor) {
+    public void registerMessageAvailableMonitor(Object monitor) {
         if (messageAvailableMonitor != null) {
             throw new IllegalStateException();
         }
